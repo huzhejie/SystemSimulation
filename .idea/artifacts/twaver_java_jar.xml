@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="twaver-java:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/twaver_java_jar</output-path>
+    <root id="root">
+      <element id="archive" name="twaver-java.jar">
+        <element id="module-output" name="twaver-java" />
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+        </element>
+      </element>
+      <element id="library" level="project" name="twaver" />
+    </root>
+  </artifact>
+</component>
