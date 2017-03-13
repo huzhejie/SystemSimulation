@@ -1,14 +1,17 @@
 package View;
 
+import Control.Switch;
 import twaver.*;
 import twaver.network.*;
 import twaver.network.background.ColorBackground;
 import twaver.network.ui.Attachment;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
+import java.util.Iterator;
 
 /**
  * Created by huzhejie on 2017/2/14.
@@ -29,6 +32,8 @@ public class DrawPanel extends TNetwork{
             "$SEPARATOR",//分隔符
             "CreateLink",
             "CreateOrthogonalLink",
+            "CreateFlexionLink",
+            "CreateShapeLink",
             "CreateText",
             "Undo",
             "Redo",
@@ -40,6 +45,7 @@ public class DrawPanel extends TNetwork{
             "ExportSVG",
             "Print"
     };
+    private  static Color tempColor = null;
 
 
     public  DrawPanel(TDataBox dataBox){
@@ -58,6 +64,7 @@ public class DrawPanel extends TNetwork{
         this.setBackground(new ColorBackground(Color.CYAN.darker().darker()));
         //设置工具栏
         this.setToolbar(NetworkToolBarFactory.getToolBar(ids, this));
+        this.getToolbar().setMinimumSize(new Dimension(30,30));
         //设置Resizable Node可以直接改变大小
         this.setResizableFilter(new ResizableFilter() {
             @Override
@@ -69,7 +76,131 @@ public class DrawPanel extends TNetwork{
         this.setElementPropertyChangeRepaintFilter(new ElementPropertyChangeRepaintFilter() {
             @Override
             public boolean isInterested(Element element, PropertyChangeEvent propertyChangeEvent) {
+                if(element instanceof Link){
+                   ((Link) element).putLinkWidth(1);
+                    ((Link) element).putLinkOutlineWidth(0);
+                    ((Link) element).putLinkAntialias(true);
+//                    if(element instanceof ShapeLink){
+//                        if(((ShapeLink)element).getTo()!=null){
+//                        }
+//                    }
+                }
                 return true;
+            }
+        });
+        //添加右键菜单
+        this.setPopupMenuGenerator(new PopupMenuGenerator() {
+            @Override
+            public JPopupMenu generate(final TView tView, final MouseEvent mouseEvent) {
+                JPopupMenu jPopupMenu = new JPopupMenu();
+                if(tView.getDataBox().getSelectionModel().isEmpty()){
+                    jPopupMenu.add(new JMenuItem("您未选择任何元件"));
+                }
+                else{
+                    final JMenuItem attribute = new JMenuItem("图形属性");
+                    final JMenuItem rotate = new JMenuItem("旋转90°");
+                    JMenuItem paint = new JMenuItem("重新着色");
+                    final JMenuItem addPoint = new JMenuItem("增加节点");
+                    final JMenuItem removePoint  = new JMenuItem("删除节点");
+                    final JMenuItem open = new JMenuItem("打开开关");
+                    final JMenuItem close = new JMenuItem("合上开关");
+
+                    jPopupMenu.add(attribute);
+                    jPopupMenu.add(paint);
+                    jPopupMenu.add(rotate);
+                    jPopupMenu.add(addPoint);
+                    jPopupMenu.add(removePoint);
+                    jPopupMenu.add(open);
+                    jPopupMenu.add(close);
+
+                    rotate.setVisible(false);
+                    addPoint.setVisible(false);
+                    removePoint.setVisible(false);
+                    open.setVisible(false);
+                    close.setVisible(false);
+
+                    Iterator iterator = DrawPanel.this.getDataBox().getSelectionModel().selection();
+                    while(iterator.hasNext()){
+                        final Element element = (Element)iterator.next();
+                        paint.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                if(tempColor==null) {
+                                    JColorChooser chooser = new JColorChooser();
+                                    Color color = chooser.showDialog(DrawPanel.this, "调色板", Color.green);
+                                    if (color == null) {
+                                        color = Color.green;
+                                    }
+                                    tempColor = color;
+                                }
+                                element.putRenderColor(tempColor);
+                            }
+                        });
+                        attribute.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+
+                            }
+                        });
+                        //如果是开关类型的元件
+                        if(element instanceof Switch) {
+                            rotate.setVisible(true);
+                            rotate.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ((Switch) element).setRotate(!((Switch) element).isRotate());
+                                    rotate.setVisible(false);
+                                }
+                            });
+                            if(((Switch)element).isTurnOn()){
+                                close.setVisible(true);
+                                close.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((Switch) element).setTurnOn(false);
+                                        close.setVisible(false);
+                                    }
+                                });
+                            }
+                            else {
+                                open.setVisible(true);
+                                open.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((Switch) element).setTurnOn(true);
+                                        open.setVisible(false);
+                                    }
+                                });
+                            }
+                        }
+                        //如果是多节点连线的元件
+                        else if(element instanceof ShapeLink) {
+                            addPoint.setVisible(true);
+                            removePoint.setVisible(true);
+                            addPoint.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ((ShapeLink) element).addPoint(mouseEvent.getPoint());
+                                    addPoint.setVisible(false);
+                                    removePoint.setVisible(false);
+                                }
+                            });
+                            removePoint.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ((ShapeLink)element).removePoint(((ShapeLink)element).getPoints().size()-1);
+                                    addPoint.setVisible(false);
+                                    removePoint.setVisible(false);
+                                }
+                            });
+                        }
+                        else{
+                            System.out.println(DrawPanel.this.getElementLogicalAt(mouseEvent.getPoint()));
+                        }
+                    }
+                    tempColor = null;
+                }
+                return jPopupMenu;
             }
         });
         //双击元素标签可以重新编辑该标签

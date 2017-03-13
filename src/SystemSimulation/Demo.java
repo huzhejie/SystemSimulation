@@ -27,6 +27,8 @@ public class Demo {
         final DrawPanelDataBox box = new DrawPanelDataBox();
         final ComponentDataBox componentBox = new ComponentDataBox();
         final DrawPanel network = new DrawPanel(box);
+        //初始化属性面板
+        PropertyPanel sheet = new PropertyPanel(box);
 
         //添加元件的鼠标左键响应事件
         network.getCanvas().addMouseListener(new MouseAdapter() {
@@ -34,18 +36,19 @@ public class Demo {
             public void mouseClicked(MouseEvent e) {
                 Element element;
                 if(e.getButton()==MouseEvent.BUTTON1){
-                        switch(temp){
-                            case "":
-                                break;
-                            default:
-                                element = componentBox.getElementByName(temp).copy();
-                                if(element!=null&&!indexSet.getSet().contains(element.getName())) {
-                                    element.setLocation(e.getPoint());
-                                    box.addElement(element);
-                                    temp = "";
-                                }
-                                break;
-                        }
+                    switch(temp){
+                        case "":
+                            break;
+                        default:
+                            element = componentBox.getElementByName(temp).copy();
+                            if(element!=null&&!indexSet.getSet().contains(element.getName())) {
+                                double zoom = network.getZoomer().getZoom();
+                                element.setLocation(e.getX()/zoom,e.getY()/zoom);
+                                box.addElement(element);
+                                temp = "";
+                            }
+                            break;
+                    }
                 }
             }
         });
@@ -70,12 +73,10 @@ public class Demo {
             public void actionPerformed(ActionEvent e) {
                 MouseActionEvent event = (MouseActionEvent)e;
                 if(event.getSource() instanceof ElementNode){
-                      temp = ((ElementNode) event.getSource()).getElement().getName();
+                    temp = ((ElementNode) event.getSource()).getElement().getName();
                 }
             }
         });
-        //初始化属性面板
-        PropertyPanel sheet = new PropertyPanel(box);
 
         //frame布局
         JScrollPane jScrollPane = new JScrollPane(sheet);

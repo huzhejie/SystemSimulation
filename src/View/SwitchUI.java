@@ -1,6 +1,7 @@
 package View;
 
 import Control.Switch;
+import twaver.Link;
 import twaver.Node;
 import twaver.TWaverConst;
 import twaver.network.TNetwork;
@@ -21,6 +22,11 @@ public class SwitchUI extends NodeUI {
     public SwitchUI(TNetwork network, Node element){
         super(network,element);
     }
+
+    /**
+     * 将元件的边框变成有节点的样式，可以用来改变元件长宽
+     * @return
+     */
     public BorderUI getBorder() {
         if(this.network.isResizable(this.element)) {
             if(this.editableBorder == null) {
@@ -36,18 +42,24 @@ public class SwitchUI extends NodeUI {
             return this.defaultBorder;
         }
     }
-    public void performAction(int gesture, MouseEvent e){
-        if(gesture==TWaverConst.MOUSE_LEFT_DOUBLE_CLICKED){
-             if(switzh!=null) {
-                 switzh.setTurnOn(!switzh.isTurnOn());
-             }
-        }
-        if(gesture==TWaverConst.MOUSE_RIGHT_CLICKED){
-            if(switzh!=null){
-                switzh.setRotate(!switzh.isRotate());
-            }
-        }
-    }
+
+//    /**
+//     * 根据鼠标的动作改变的开关的开闭以及是否旋转
+//     * @param gesture
+//     * @param e
+//     */
+//    public void performAction(int gesture, MouseEvent e){
+//        if(gesture==TWaverConst.MOUSE_LEFT_DOUBLE_CLICKED){
+//             if(switzh!=null) {
+//                 switzh.setTurnOn(!switzh.isTurnOn());
+//             }
+//        }
+//        if(gesture==TWaverConst.MOUSE_RIGHT_CLICKED){
+//            if(switzh!=null){
+//                switzh.setRotate(!switzh.isRotate());
+//            }
+//        }
+//    }
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);
@@ -56,7 +68,7 @@ public class SwitchUI extends NodeUI {
         //get position
         final Point location = switzh.getLocation();
         final Dimension size = switzh.getSize();
-        boolean trunOn = switzh.isTurnOn();
+        boolean turnOn = switzh.isTurnOn();
         boolean isRotate = switzh.isRotate();
         int x = location.x;
         int y = location.y;
@@ -65,21 +77,25 @@ public class SwitchUI extends NodeUI {
 
 
         //draw color frame
-        g.setColor(switzh.getBodyColor());
+        g.setColor(switzh.getRenderColor());
 
         if (!isRotate) {
-            if (trunOn) {
+            switzh.setToPoint(0, -height/2);
+            switzh.setFromPoint(0, height/2-8);
+            if (turnOn) {
                 g.drawOval(x + width / 2 - width / 6, y, width / 6, width / 6);
                 g.drawOval(x + width / 2, y + height - 10, width / 6, width / 6);
-                g.drawLine(x + width, y, x + width / 2, y + height - 10);
+                g.drawLine(x + width, y, x + width / 2, y + height - 8);
             } else {
                 g.drawOval(x + width / 2 - width / 6, y, width / 6, width / 6);
                 g.drawOval(x + width / 2, y + height - 10, width / 6, width / 6);
-                g.drawLine(x + width / 2, y, x + width / 2, y + height - 10);
+                g.drawLine(x + width / 2, y, x + width / 2, y + height - 8);
             }
 
         }else{
-            if (trunOn) {
+            switzh.setToPoint(-width/2, 0);
+            switzh.setFromPoint(width/2, 0);
+            if (turnOn) {
                 g.drawOval(x, y+height/2-width/6, width / 6, width / 6);
                 g.drawOval(x+width-width/6, y+height/2-width/6, width / 6, width / 6);
                 g.drawLine(x+width/6, y+height/2, x + width-width/6, y);

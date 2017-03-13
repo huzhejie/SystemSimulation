@@ -16,16 +16,16 @@ public class DrawPanelDataBox extends TDataBox {
      */
     private void init(){
         //添加节点
-        ResizableNode node  = new ResizableNode();
-        node.setLocation(20,20);
-        node.setName("node");
-        node.setSize(30,30);
-        this.addElement(node);
-        ResizableNode node1 = new ResizableNode();
-        node1.setName("node1");
-        node1.setLocation(100, 100);
-        node1.setSize(30,30);
-        this.addElement(node1);
+//        ResizableNode node  = new ResizableNode();
+//        node.setLocation(20,20);
+//        node.setName("node");
+//        node.setSize(30,30);
+//        this.addElement(node);
+//        ResizableNode node1 = new ResizableNode();
+//        node1.setName("node1");
+//        node1.setLocation(100, 100);
+//        node1.setSize(30,30);
+//        this.addElement(node1);
 
 //        for(int i = 2;i<100000;i++) {
 //            Switch tempNode = new Switch();
@@ -35,15 +35,15 @@ public class DrawPanelDataBox extends TDataBox {
 //            this.addElement(tempNode);
 //        }
 
-        //在俩个节点之间添加连线
-        Link link = new Link(node,node1);
-        link.putLinkWidth(1);
-        //抗锯齿
-        link.putLinkAntialias(true);
-        //设置线的边框宽度为0
-        link.putLinkOutlineWidth(0);
-        link.setName("lalala");
-        link.putLinkLabelRotatable(true);
-        this.addElement(link);
+//        //在俩个节点之间添加连线
+//        Link link = new Link(node,node1);
+//        link.putLinkWidth(1);
+//        //抗锯齿
+//        link.putLinkAntialias(true);
+//        //设置线的边框宽度为0
+//        link.putLinkOutlineWidth(0);
+//        link.setName("lalala");
+//        link.putLinkLabelRotatable(true);
+//        this.addElement(link);
     }
 }
