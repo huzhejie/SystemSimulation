@@ -6,7 +6,6 @@ import twaver.*;
  * Created by huzhejie on 2017/2/14.
  */
 public class DrawPanelDataBox extends TDataBox {
-//    private static String tempName="";
     public  DrawPanelDataBox(){
          this.init();
     }
@@ -35,12 +34,12 @@ public class DrawPanelDataBox extends TDataBox {
 //            this.addElement(tempNode);
 //        }
 
-//        //在俩个节点之间添加连线
+        //在俩个节点之间添加连线
 //        Link link = new Link(node,node1);
 //        link.putLinkWidth(1);
-//        //抗锯齿
+        //抗锯齿
 //        link.putLinkAntialias(true);
-//        //设置线的边框宽度为0
+        //设置线的边框宽度为0
 //        link.putLinkOutlineWidth(0);
 //        link.setName("lalala");
 //        link.putLinkLabelRotatable(true);

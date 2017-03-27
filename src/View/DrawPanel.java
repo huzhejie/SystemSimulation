@@ -1,24 +1,25 @@
 package View;
 
-import Control.Switch;
+import Control.*;
+import View.Frame.*;
 import twaver.*;
 import twaver.network.*;
 import twaver.network.background.ColorBackground;
-import twaver.network.ui.Attachment;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by huzhejie on 2017/2/14.
  */
 public class DrawPanel extends TNetwork{
     //定义编辑工具栏中需要的用到的功能
-    private String ids[] = new String[]{
+    public String ids[] = new String[]{
             "Selection",
             "LazyMove",
             "Magnifier",
@@ -45,7 +46,25 @@ public class DrawPanel extends TNetwork{
             "ExportSVG",
             "Print"
     };
-    private  static Color tempColor = null;
+    private Color elementColor = null;
+//    private static Color voltageColor_0 = null;
+//    private static Color voltageColor_6 = null;
+//    private static Color voltageColor_10 = null;
+//    private static Color voltageColor_35 = null;
+//    private static Color voltageColor_110 = null;
+//    private static Color voltageColor_220 = null;
+//    private static Color voltageColor_500 = null;
+//    private static Color voltageColor_750 = null;
+
+    private Color voltageColor_0 = Color.gray;
+    private Color voltageColor_6 = Color.green;
+    private Color voltageColor_10 = Color.blue;
+    private Color voltageColor_35 = Color.yellow;
+    private Color voltageColor_110 = Color.red;
+    private Color voltageColor_220 = Color.orange;
+    private Color voltageColor_500 = Color.white;
+    private Color voltageColor_750 = Color.white;
+
 
 
     public  DrawPanel(TDataBox dataBox){
@@ -57,14 +76,11 @@ public class DrawPanel extends TNetwork{
      * 初始化画板
      */
     private void init(final TDataBox dataBox){
-        //设置面板长宽
-//        final int width = 4000;
-//        final int height= 4000;
         //设置背景颜色
         this.setBackground(new ColorBackground(Color.CYAN.darker().darker()));
         //设置工具栏
         this.setToolbar(NetworkToolBarFactory.getToolBar(ids, this));
-        this.getToolbar().setMinimumSize(new Dimension(30,30));
+        this.getToolbar().setMinimumSize(new Dimension(50,50));
         //设置Resizable Node可以直接改变大小
         this.setResizableFilter(new ResizableFilter() {
             @Override
@@ -77,13 +93,9 @@ public class DrawPanel extends TNetwork{
             @Override
             public boolean isInterested(Element element, PropertyChangeEvent propertyChangeEvent) {
                 if(element instanceof Link){
-                   ((Link) element).putLinkWidth(1);
+                    ((Link) element).putLinkWidth(1);
                     ((Link) element).putLinkOutlineWidth(0);
                     ((Link) element).putLinkAntialias(true);
-//                    if(element instanceof ShapeLink){
-//                        if(((ShapeLink)element).getTo()!=null){
-//                        }
-//                    }
                 }
                 return true;
             }
@@ -98,6 +110,7 @@ public class DrawPanel extends TNetwork{
                 }
                 else{
                     final JMenuItem attribute = new JMenuItem("图形属性");
+                    final JMenuItem property = new JMenuItem("设备资料");
                     final JMenuItem rotate = new JMenuItem("旋转90°");
                     JMenuItem paint = new JMenuItem("重新着色");
                     final JMenuItem addPoint = new JMenuItem("增加节点");
@@ -106,6 +119,7 @@ public class DrawPanel extends TNetwork{
                     final JMenuItem close = new JMenuItem("合上开关");
 
                     jPopupMenu.add(attribute);
+                    jPopupMenu.add(property);
                     jPopupMenu.add(paint);
                     jPopupMenu.add(rotate);
                     jPopupMenu.add(addPoint);
@@ -114,6 +128,7 @@ public class DrawPanel extends TNetwork{
                     jPopupMenu.add(close);
 
                     rotate.setVisible(false);
+                    property.setVisible(false);
                     addPoint.setVisible(false);
                     removePoint.setVisible(false);
                     open.setVisible(false);
@@ -122,29 +137,43 @@ public class DrawPanel extends TNetwork{
                     Iterator iterator = DrawPanel.this.getDataBox().getSelectionModel().selection();
                     while(iterator.hasNext()){
                         final Element element = (Element)iterator.next();
+                        if(element.getClientProperty("attribute")==null){
+                            Map<String,Object> attributeMap = new HashMap<>();
+                            element.putClientProperty("attribute",attributeMap);
+                        }
+
                         paint.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                if(tempColor==null) {
+                                if(elementColor ==null) {
                                     JColorChooser chooser = new JColorChooser();
                                     Color color = chooser.showDialog(DrawPanel.this, "调色板", Color.green);
                                     if (color == null) {
                                         color = Color.green;
                                     }
-                                    tempColor = color;
+                                    elementColor = color;
                                 }
-                                element.putRenderColor(tempColor);
+                                element.putRenderColor(elementColor);
                             }
                         });
                         attribute.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-
+                                final AttributeFrame attributeFrame = new AttributeFrame(element);
+                                attributeFrame.setVisible(true);
                             }
                         });
                         //如果是开关类型的元件
                         if(element instanceof Switch) {
                             rotate.setVisible(true);
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new SwitchFrame();
+                                    property.setVisible(false);
+                                }
+                            });
                             rotate.addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -173,6 +202,123 @@ public class DrawPanel extends TNetwork{
                                 });
                             }
                         }
+                        //如果是卷变器
+                        else if(element instanceof DoubleRollChange){
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new RollChangeFrame();
+                                    property.setVisible(false);
+                                }
+                            });
+                        }
+                        //如果是断路器
+                        else if(element instanceof Breaker){
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new BreakerFrame();
+                                    property.setVisible(false);
+                                }
+                            });
+                        }
+                        //如果是接地开关
+                        else if(element instanceof GroundSwitch){
+                            rotate.setVisible(true);
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new EarthSwitchFrame();
+                                    property.setVisible(false);
+                                }
+                            });
+                            rotate.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ((GroundSwitch) element).setRotate(!((GroundSwitch) element).isRotate());
+                                    rotate.setVisible(false);
+                                }
+                            });
+                            if(((GroundSwitch)element).isTurnOn()){
+                                close.setVisible(true);
+                                close.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((GroundSwitch) element).setTurnOn(false);
+                                        close.setVisible(false);
+                                    }
+                                });
+                            }
+                            else {
+                                open.setVisible(true);
+                                open.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((GroundSwitch) element).setTurnOn(true);
+                                        open.setVisible(false);
+                                    }
+                                });
+                            }
+                        }
+                        //如果是重要用户，箱变，配电站
+                        else if(element instanceof BoxChange || element instanceof DistributionStation){
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new ControlCenterFrame();
+                                    property.setVisible(false);
+                                }
+                            });
+                        }
+                        //如果是熔断器，跌落熔断器，保险丝
+                        else if(element instanceof Fuse){
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new FuseFrame();
+                                    property.setVisible(false);
+                                }
+                            });
+                        }
+                        //如果是馈线
+//                        else if(element instanceof kuixian){
+//                            property.setVisible(true);
+//                            property.addActionListener(new ActionListener() {
+//                                @Override
+//                                public void actionPerformed(ActionEvent e) {
+//                                    new FeederFrame();
+//                                    property.setVisible(false);
+//                                }
+//                            });
+//                        }
+                        //如果是变电所
+                        else if(element instanceof VariableField){
+                            property.setVisible(true);
+                            property.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new SubstationFrame();
+                                    property.setVisible(false);
+                                }
+                            });
+                        }
+                        //如果是开闭所，环网柜，分支箱
+//                        else if(element instanceof kaibisuo){
+//                            property.setVisible(true);
+//                            property.addActionListener(new ActionListener() {
+//                                @Override
+//                                public void actionPerformed(ActionEvent e) {
+//                                    new SwitchStationFrame();
+//                                    property.setVisible(false);
+//                                }
+//                            });
+//                        }
+
                         //如果是多节点连线的元件
                         else if(element instanceof ShapeLink) {
                             addPoint.setVisible(true);
@@ -194,22 +340,20 @@ public class DrawPanel extends TNetwork{
                                 }
                             });
                         }
-                        else{
-                            System.out.println(DrawPanel.this.getElementLogicalAt(mouseEvent.getPoint()));
-                        }
                     }
-                    tempColor = null;
+                    elementColor = null;
                 }
                 return jPopupMenu;
             }
         });
         //双击元素标签可以重新编辑该标签
-        this.setElementLabelEditableFilter(new EditableFilter() {
-            @Override
-            public boolean isEditable(Element element) {
-                return true;
-            }
-        });
+//        this.setElementLabelEditableFilter(new EditableFilter() {
+//            @Override
+//            public boolean isEditable(Element element) {
+//                return true;
+//            }
+//        });
+        //加快拖动速度
         this.setDraggingSpeed(DraggingSpeed.HIGH);
         //可以使用ctrl+c以及ctrl+v快捷键(不复制子节点)
 //        this.setEnableCopyPasteWithKeyboard(true);
@@ -241,5 +385,69 @@ public class DrawPanel extends TNetwork{
             }
         });
 
+    }
+
+    public Color getVoltageColor_0() {
+        return voltageColor_0;
+    }
+
+    public void setVoltageColor_0(Color voltageColor_0) {
+        this.voltageColor_0 = voltageColor_0;
+    }
+
+    public Color getVoltageColor_6() {
+        return voltageColor_6;
+    }
+
+    public void setVoltageColor_6(Color voltageColor_6) {
+        this.voltageColor_6 = voltageColor_6;
+    }
+
+    public Color getVoltageColor_10() {
+        return voltageColor_10;
+    }
+
+    public void setVoltageColor_10(Color voltageColor_10) {
+        this.voltageColor_10 = voltageColor_10;
+    }
+
+    public Color getVoltageColor_35() {
+        return voltageColor_35;
+    }
+
+    public void setVoltageColor_35(Color voltageColor_35) {
+        this.voltageColor_35 = voltageColor_35;
+    }
+
+    public Color getVoltageColor_110() {
+        return voltageColor_110;
+    }
+
+    public void setVoltageColor_110(Color voltageColor_110) {
+        this.voltageColor_110 = voltageColor_110;
+    }
+
+    public Color getVoltageColor_220() {
+        return voltageColor_220;
+    }
+
+    public void setVoltageColor_220(Color voltageColor_220) {
+        this.voltageColor_220 = voltageColor_220;
+    }
+
+    public Color getVoltageColor_500() {
+        return voltageColor_500;
+    }
+
+    public void setVoltageColor_500(Color voltageColor_500) {
+        this.voltageColor_500 = voltageColor_500;
+    }
+
+    public Color getVoltageColor_750() {
+        return voltageColor_750;
+    }
+
+    public void setVoltageColor_750(Color voltageColor_750) {
+        this.voltageColor_750 = voltageColor_750;
     }
 }

@@ -84,12 +84,12 @@ public class SwitchUI extends NodeUI {
             switzh.setFromPoint(0, height/2-8);
             if (turnOn) {
                 g.drawOval(x + width / 2 - width / 6, y, width / 6, width / 6);
-                g.drawOval(x + width / 2, y + height - 10, width / 6, width / 6);
-                g.drawLine(x + width, y, x + width / 2, y + height - 8);
+                g.drawOval(x + width / 2, y + height - width / 6, width / 6, width / 6);
+                g.drawLine(x + width, y, x + width*7 / 12, y + height - width / 6);
             } else {
                 g.drawOval(x + width / 2 - width / 6, y, width / 6, width / 6);
-                g.drawOval(x + width / 2, y + height - 10, width / 6, width / 6);
-                g.drawLine(x + width / 2, y, x + width / 2, y + height - 8);
+                g.drawOval(x + width / 2, y + height - width / 6, width / 6, width / 6);
+                g.drawLine(x + width / 2, y+width/12, x + width*7 / 12, y + height - width / 6);
             }
 
         }else{
@@ -98,11 +98,11 @@ public class SwitchUI extends NodeUI {
             if (turnOn) {
                 g.drawOval(x, y+height/2-width/6, width / 6, width / 6);
                 g.drawOval(x+width-width/6, y+height/2-width/6, width / 6, width / 6);
-                g.drawLine(x+width/6, y+height/2, x + width-width/6, y);
+                g.drawLine(x+width/12, y+height/2, x + width-width/12, y+height/6);
             } else {
                 g.drawOval(x, y+height/2-width/6, width / 6, width / 6);
                 g.drawOval(x+width-width/6, y+height/2-width/6, width / 6, width / 6);
-                g.drawLine(x+width/6, y+height/2, x + width-width/6, y+height/2-width/6);
+                g.drawLine(x+width/12, y+height/2, x + width-width/12, y+height/2-width/6);
             }
 
         }

@@ -1,11 +1,23 @@
 package SystemSimulation;
 
-import twaver.TWaverUtil;
+import View.DrawPanel;
+import View.Frame.ExportImageFrame;
+import View.Frame.OpenFrame;
+import View.Frame.VoltageColorFrame;
+import twaver.*;
+import twaver.base.A.E.P;
+import twaver.network.background.ColorBackground;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by huzhejie on 2017/2/15.
@@ -16,7 +28,9 @@ public class MenuBar extends JMenuBar {
     private JMenu viewMenu = new JMenu("设置(S)");
     private JMenu topologyMenu = new JMenu("拓扑(T)");
     private JMenu helpMenu = new JMenu("帮助(H)");
-    public MenuBar(){
+    
+    protected OpenFrame openFrame = null;
+    public MenuBar(final DrawPanel network){
         //为菜单设置快捷键（ALT+一个英文字母）
         fileMenu.setMnemonic(KeyEvent.VK_F);
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -31,7 +45,7 @@ public class MenuBar extends JMenuBar {
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.CTRL_MASK));
         fileMenu.add(item);
         //打开
-        JMenuItem item1=new JMenuItem("打开(O)",KeyEvent.VK_O);
+        JMenuItem item1=new JMenuItem("打开/查看历史图(O)",KeyEvent.VK_O);
         item1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,ActionEvent.CTRL_MASK));
         fileMenu.add(item1);
         //保存
@@ -39,8 +53,11 @@ public class MenuBar extends JMenuBar {
         item2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,ActionEvent.CTRL_MASK));
         fileMenu.add(item2);
         //导出图片
-        JMenuItem item3 = new JMenuItem("导出图片");
+        JMenuItem item3 = new JMenuItem("导出图片(png)");
         fileMenu.add(item3);
+        //导出SVG
+        JMenuItem item0 = new JMenuItem("导出图片(SVG)");
+        fileMenu.add(item0);
         /**
          * 编辑菜单
          */
@@ -75,7 +92,7 @@ public class MenuBar extends JMenuBar {
         item10.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,ActionEvent.CTRL_MASK));
         viewMenu.add(item10);
         //工作区大小设置
-        JMenuItem item11 = new JMenuItem("工作区大小设置",KeyEvent.VK_G);
+        JMenuItem item11 = new JMenuItem("自动校正工作区大小",KeyEvent.VK_G);
         item11.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,ActionEvent.CTRL_MASK));
         viewMenu.add(item11);
         //设置电压等级颜色
@@ -111,6 +128,218 @@ public class MenuBar extends JMenuBar {
         this.add(viewMenu);
         this.add(topologyMenu);
         this.add(helpMenu);
-    }
 
+        /**
+         * 菜单栏逻辑部分
+         */
+        //新建文件
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = null;
+                int option = JOptionPane.showConfirmDialog(null,
+                        "是否保存当前文件？", "保存文件？", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null);
+                switch (option) {
+                    case JOptionPane.YES_NO_OPTION: {
+                        network.clearSelection();
+                        if(chooser == null) {
+                            FileSystemView fsv = FileSystemView.getFileSystemView();
+                            chooser = new JFileChooser(fsv);
+                            chooser.setFileFilter(new FileFilter() {
+                                public boolean accept(File f) {
+                                    return f.isDirectory() || f.getName().toLowerCase().endsWith(".xml");
+                                }
+                                public String getDescription() {
+                                    return "XML File";
+                                }
+                            });
+                        }
+
+                        String fileName = null;
+                        int returnVal = chooser.showSaveDialog(P.B(network));
+                        if(returnVal == 0) {
+                            fileName = chooser.getSelectedFile().getAbsolutePath();
+                            if(fileName != null) {
+                                if(!fileName.toUpperCase().endsWith(".XML")) {
+                                    fileName = fileName + ".xml";
+                                }
+
+                                try {
+                                    DataBoxOutputSetting ex = new DataBoxOutputSetting();
+                                    ex.setWithAlarmState(true);
+                                    ex.setWithLayers(true);
+                                    network.getDataBox().output(fileName, ex);
+                                } catch (IOException exx) {
+                                    TWaverUtil.handleError((String)null, exx);
+                                }
+                            }
+                        }
+                        network.getDataBox().clear();
+                        break;
+                    }
+                    case JOptionPane.NO_OPTION:
+                        network.getDataBox().clear();
+                        break;
+                }
+            }
+        });
+        //打开文件夹目录
+        item1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String path;
+                FileSystemView fsv = FileSystemView.getFileSystemView();
+                JFileChooser chooser = new JFileChooser(fsv);
+                chooser.setCurrentDirectory(fsv.getHomeDirectory());
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int result = chooser.showOpenDialog(chooser);
+                chooser.setDialogTitle("选择文件目录");
+                chooser.setApproveButtonText("确定");
+                if(result==JFileChooser.APPROVE_OPTION){
+                    path = chooser.getSelectedFile().getAbsolutePath();
+                    File file = new File(path);
+                    File[] listFile = file.listFiles();
+                    java.util.List<String> fileNames = new ArrayList<>();
+                    java.util.List<Long> timeStamp = new ArrayList<>();
+                    for(int i = 0;i<listFile.length;i++){
+                        if(listFile[i].getName().toLowerCase().endsWith(".xml")) {
+                            fileNames.add(listFile[i].getName().substring(0, listFile[i].getName().lastIndexOf(".")));
+                            timeStamp.add(listFile[i].lastModified());
+                        }
+                    }
+                    if(openFrame==null)
+                        openFrame = new OpenFrame(fileNames,timeStamp,path,network);
+                    else
+                        openFrame.setVisible(true);
+                }
+            }
+        });
+        //保存文件
+        item2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = null;
+                network.clearSelection();
+                if(chooser == null) {
+                    FileSystemView fsv = FileSystemView.getFileSystemView();
+                    chooser = new JFileChooser(fsv);
+                    chooser.setFileFilter(new FileFilter() {
+                        public boolean accept(File f) {
+                            return f.isDirectory() || f.getName().toLowerCase().endsWith(".xml");
+                        }
+
+                        public String getDescription() {
+                            return "XML File";
+                        }
+                    });
+                }
+
+                String fileName = null;
+                int returnVal = chooser.showSaveDialog(P.B(network));
+                if(returnVal == 0) {
+                    fileName = chooser.getSelectedFile().getAbsolutePath();
+                    if(fileName != null) {
+                        if(!fileName.toUpperCase().endsWith(".XML")) {
+                            fileName = fileName + ".xml";
+                        }
+
+                        try {
+                            DataBoxOutputSetting ex = new DataBoxOutputSetting();
+//                            ex.setWithElementId(this.F);
+                            ex.setWithAlarmState(true);
+                            ex.setWithLayers(true);
+//                            if(this.B) {
+//                                TSubNetwork images = network.getCurrentSubNetwork();
+//                                ex.setElementFilter(new SubNetworkPersistentFilter(images));
+//                            }
+//
+//
+//                                HashMap images1 = new HashMap();
+//                                Iterator it = network.getDataBox().iterator();
+//
+//                                while(it.hasNext()) {
+//                                    Element element = (Element)it.next();
+//                                    MenuBar.this.A(images1, element.getImageURL());
+//                                    MenuBar.this.A(images1, element.getIconURL());
+//                                }
+//
+//                                ex.setImages(images1);
+
+                            network.getDataBox().output(fileName, ex);
+                        } catch (IOException exx) {
+                            TWaverUtil.handleError((String)null, exx);
+                        }
+
+                    }
+                }
+
+            }
+        });
+        //导出图片(png)
+        item3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Window parent = P.B(network);
+                if(parent instanceof Frame) {
+                    new ExportImageFrame((Frame)parent,network);
+                } else {
+                    new ExportImageFrame((Dialog)parent,network);
+                }
+            }
+        });
+        //导出图片(svg)
+        item0.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = null;
+                if(chooser == null) {
+                    chooser = new JFileChooser();
+                    chooser.setFileFilter(new FileFilter() {
+                        public boolean accept(File f) {
+                            return f.isDirectory() || f.getName().toLowerCase().endsWith(".svg");
+                        }
+
+                        public String getDescription() {
+                            return "SVG File";
+                        }
+                    });
+                }
+
+                int returnVal = chooser.showSaveDialog(P.B(network));
+                if(returnVal == 0) {
+                    String fileName = chooser.getSelectedFile().getAbsolutePath();
+                    network.exportSVG(fileName);
+                }
+            }
+        });
+        //设置背景色
+        item10.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JColorChooser chooser = new JColorChooser();
+                Color color = chooser.showDialog(network,"背景色选择",network.getBackground());
+                if(color!=null){
+                    network.setBackground(new ColorBackground(color));
+                }
+            }
+        });
+        //调整画布大小
+        item11.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                network.forceAdjustCanvasSize();
+            }
+        });
+        //电压等级颜色调整
+        item12.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               new VoltageColorFrame(network);
+            }
+        });
+
+
+
+    }
 }

@@ -11,8 +11,10 @@ public class ComponentIndexSet {
     public ComponentIndexSet(){
         //添加元件目录
         set.add("开关");
-        set.add("发电设备");
+        set.add("卷变");
         set.add("断路器");
+        set.add("PT");
+        set.add("站用变");
     }
 
     public Set<String> getSet() {

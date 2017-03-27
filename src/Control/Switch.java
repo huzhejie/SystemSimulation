@@ -17,7 +17,7 @@ public class Switch extends ResizableNode {
     private Point fromPoint = new Point(0,0);
     private Point toPoint = new Point(0,0);
     public Switch(){
-        super.setImage(null);
+        super();
         init();
     }
     public void init(){

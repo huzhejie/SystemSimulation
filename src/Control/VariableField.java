@@ -1,34 +1,43 @@
 package Control;
 
 import View.VariableFieldUI;
-import twaver.RotatableNode;
+import twaver.ResizableNode;
 import twaver.TWaverConst;
 
 import java.awt.*;
 
 /**
  * Created by Administrator on 2017-02-17.
+ * 变电站
  */
-public class VariableField extends RotatableNode {
-    private boolean turnOn = false;
+public class VariableField extends ResizableNode {
+    private boolean isRotate = false;
 
     public VariableField() {
-        super();
+        super.setImage(null);
         init();
     }
 
     public void init() {
-        this.putBorderColor(Color.black);//元件边框的颜色
+        this.putRenderColor(Color.GREEN);
+        this.putBorderColor(Color.black);
         this.putBorderInsets(12);
         this.putBorderStroke(TWaverConst.STROKE_SQUARE_THINNEST);
-//        this.setSize(5,30);
+        this.setSize(40,30);
     }
-
-    public boolean isTurnOn() {
-        return turnOn;
+    public boolean isRotate(){
+        return isRotate;
+    }
+    public void setRotate(boolean isRotate){
+        if(this.isRotate!=isRotate){
+            boolean oldValue = this.isRotate;
+            this.isRotate = isRotate;
+            this.firePropertyChange("isRotate",oldValue,this.isRotate);
+        }
     }
 
     public String getUIClassID() {
         return VariableFieldUI.class.getName();
     }
 }
+
