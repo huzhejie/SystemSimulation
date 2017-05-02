@@ -1,7 +1,17 @@
 package View.Frame;
 
+
+import twaver.Element;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,21 +32,21 @@ public class FeederFrame extends JFrame {
     private JComboBox ff = new JComboBox();
     private JTextField gg = new JTextField();
 
-    private JComboBox vaa = new JComboBox();
-    private JComboBox vbb = new JComboBox();
+    private JTextField vaa = new JTextField();
+    private JTextField vbb = new JTextField();
 
-    private JComboBox saa = new JComboBox();
-    private JComboBox sbb = new JComboBox();
+    private JTextField saa = new JTextField();
+    private JTextField sbb = new JTextField();
 
 
     private JButton vertify = new JButton("确定");
     private JButton cancel = new JButton("取消");
-    //参数map
-    private Map<String,Object> map = new HashMap<>();
 
-    public FeederFrame(){
+    private SimpleDateFormat format =  new SimpleDateFormat("MM:dd hh:mm:ss");
+
+    public FeederFrame(final Element element, final Connection connection){
         super();
-//        this.map = (HashMap)element.getClientProperty("rollChangePara");
+        this.setVisible(true);
         this.setTitle("线路参数设置");
         this.setResizable(false);
         this.setSize(600,700);
@@ -207,10 +217,106 @@ public class FeederFrame extends JFrame {
         ff.addItem("电缆线路");
         ff.addItem("架空线路");
         ff.addItem("混合线路");
+        ff.setSelectedItem("电缆线路");
+
+        if(element.getClientProperty("numberID")!=null)
+            aa.setText(element.getClientProperty("numberID").toString());
+        else
+            aa.setText("");
+        bb.setText(element.getName());
+        aa.setEditable(false);
+        bb.setEditable(false);
+
+        /**
+         * 载入数据
+         */
+        loadData(element,connection);
+
+        vertify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //更新开关电压等级数据
+                element.putClientProperty("rootVoltage",ff.getSelectedItem());
+                //插入或更新数据
+                writeData(element,connection);
+                JOptionPane.showMessageDialog(null,"馈线资料修改成功!");
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FeederFrame.this.setVisible(false);
+            }
+        });
 
     }
-    public static void main(String[] args){
-        FeederFrame frame = new FeederFrame();
-        frame.setVisible(true);
+
+    /**
+     * 写入数据
+     * @param element
+     * @param connection
+     */
+    public void loadData(Element element,Connection connection){
+        if(element.getClientProperty("ID")==null)
+            return;
+        try {
+            Statement stmt = connection.createStatement();
+            String query = "Select * FROM line WHERE LineNum='"+element.getClientProperty("ID")+"'";
+            ResultSet rt = stmt.executeQuery(query);
+            while(rt.next()){
+                aa.setText("馈线"+element.getClientProperty("numberID").toString());
+                bb.setText(rt.getString(2));
+                cc.setText(rt.getString(3));
+                dd.setSelectedItem(rt.getObject(4));
+                ee.setText(String.valueOf(rt.getInt(5)));
+                ff.setSelectedItem(rt.getObject(6));
+                gg.setText(String.valueOf(rt.getDouble(7)));
+                vaa.setText(rt.getString(8));
+                vbb.setText(rt.getString(9));
+                saa.setText(rt.getString(10));
+                sbb.setText(rt.getString(11));
+            }
+            rt.close();
+            stmt.close();
+        }catch (Exception e){
+            System.out.println("馈线数据载入错误");
+            e.printStackTrace();
+        }
     }
+
+    /**
+     * 插入或更新数据
+     * @param element
+     * @param connection
+     */
+
+    public void writeData(Element element,Connection connection){
+        if(element.getClientProperty("numberID")!=null)
+            try {
+                element.putClientProperty("ID",format.format(new Date())+aa.getText().trim());
+                Statement stmt = connection.createStatement();
+                String query = "INSERT INTO line(LineNum,LineName,LineModel,VoltageLevel,ControlCurrent,LineType,LineLength,FSubStationName,FSwitchName,TSubStationName,TSwitchName)"+
+                        "VALUES ('"+element.getClientProperty("ID")+"','"+bb.getText().trim()+"','"+cc.getText().trim()+"','"+dd.getSelectedItem().toString()+"',"+Double.parseDouble(ee.getText().trim())+",'"+
+                        ff.getSelectedItem().toString()+"',"+Double.parseDouble(gg.getText().trim())+",'"+vaa.getText().toString()+"','"+vbb.getText().toString()+"','"+saa.getText().toString()+","+sbb.getText().toString()+"')";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("馈线数据插入错误");
+                e.printStackTrace();
+            }
+        else
+            try{
+                Statement stmt = connection.createStatement();
+                String query = "UPDATE line SET LineName='"+bb.getText().trim()+"',LineModel='"+cc.getText().trim()+"',VoltageLevel='"+dd.getSelectedItem().toString()+"',ControlCurrent="+Double.parseDouble(ee.getText().trim())+",LineType='"+
+                        ff.getSelectedItem().toString()+"',LineLength="+Double.parseDouble(gg.getText().trim())+",FSubStationName='"+vaa.getText().toString()+"',FSwitchName='"+vbb.getText().toString()+"',TSubStationName='"+saa.getText().toString()+
+                        "',TSwitchName='"+sbb.getText().toString()+"' WHERE LineNum='"+element.getClientProperty("ID")+"'";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("馈线数据写入错误");
+                e.printStackTrace();
+            }
+
+    }
+
 }

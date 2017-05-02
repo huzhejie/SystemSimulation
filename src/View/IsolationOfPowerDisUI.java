@@ -52,6 +52,7 @@ public class IsolationOfPowerDisUI extends NodeUI {
         final Point location = isolationOfPowerDis.getLocation();
         final Dimension size = isolationOfPowerDis.getBounds().getSize();
         boolean isRotate = isolationOfPowerDis.isRotate();
+        boolean isTurnOn = isolationOfPowerDis.isTurnOn();
         int x = location.x;
         int y = location.y;
         int width = size.width;
@@ -62,26 +63,39 @@ public class IsolationOfPowerDisUI extends NodeUI {
         if(!isRotate){
             isolationOfPowerDis.setFromPoint(width/2,0);
             isolationOfPowerDis.setToPoint(-width/2,0);
+            if(!isTurnOn) {
 //            g.setColor(Color.green);
-            g.drawLine(x,y+height/2,x+width/4,y+height/2);
-            g.drawLine(x+width/4,y+height/2,x+width*3/4,y+height/6);
-            g.drawLine(x+width*3/4,y+height/2,x+width,y+height/2);
+                g.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 6);
+                g.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }else {
+//                g.setColor(Color.green);
+                g.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 2);
+                g.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
 
         }else
         {
             isolationOfPowerDis.setFromPoint(0,height/2);
             isolationOfPowerDis.setToPoint(0,-height/2);
-            int temp1=x;
-            x=y;
-            y=temp1;
-            int temp2=width;
-            width=height;
-            height=temp2;
-            Graphics2Dextend g1=new Graphics2Dextend(g);
-//            g1.setColor(Color.green);
-            g1.drawLine(x,y+height/2,x+width/4,y+height/2);
-            g1.drawLine(x+width/4,y+height/2,x+width*3/4,y+height/6);
-            g1.drawLine(x+width*3/4,y+height/2,x+width,y+height/2);
+            int temp1 = x;
+            x = y;
+            y = temp1;
+            int temp2 = width;
+            width = height;
+            height = temp2;
+            Graphics2Dextend g1 = new Graphics2Dextend(g);
+            if(!isTurnOn) {
+                g1.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g1.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 6);
+                g1.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
+            else{
+                g1.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g1.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 2);
+                g1.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
         }
     }
 

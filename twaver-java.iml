@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="twaver" level="project" />
     <orderEntry type="library" name="poi-3.14-20160307" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-5.1.41-bin" level="project" />
   </component>
 </module>

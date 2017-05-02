@@ -52,6 +52,7 @@ public class ColumnIsolationSwitchUI extends NodeUI {
         final Point location = columnIsolationSwitch.getLocation();
         final Dimension size = columnIsolationSwitch.getBounds().getSize();
         boolean isRotate = columnIsolationSwitch.isRotate();
+        boolean isTurnOn = columnIsolationSwitch.isTurnOn();
         int x = location.x;
         int y = location.y;
         int width = size.width;
@@ -61,30 +62,53 @@ public class ColumnIsolationSwitchUI extends NodeUI {
 
         //画柱断路开关
         if(!isRotate){
-            columnIsolationSwitch.setFromPoint(width/2,0);
-            columnIsolationSwitch.setToPoint(-width/2,0);
-//            g.setColor(Color.green);
-            g.drawLine(x,y+height/2,x+width/4,y+height/2);
-            g.drawLine(x+width/4,y+height/2,x+width*3/4,y+height/6);
-            g.drawLine(x+width*3/4,y+height/3,x+width*3/4,y+height*2/3);
-            g.drawLine(x+width*3/4,y+height/2,x+width,y+height/2);
+            columnIsolationSwitch.setFromPoint(width / 2, 0);
+            columnIsolationSwitch.setToPoint(-width / 2, 0);
+            if(!isTurnOn) {
+                g.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 6);
+                g.drawLine(x + width * 3 / 4, y + height / 3, x + width * 3 / 4, y + height * 2 / 3);
+                g.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
+            else{
+                g.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 2);
+                g.drawLine(x + width * 3 / 4, y + height / 3, x + width * 3 / 4, y + height * 2 / 3);
+                g.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
 
         }else
         {
             columnIsolationSwitch.setFromPoint(0,-height/2);
             columnIsolationSwitch.setToPoint(0,height/2);
-            int temp1=x;
-            x=y;
-            y=temp1;
-            int temp2=width;
-            width=height;
-            height=temp2;
-            Graphics2Dextend g1=new Graphics2Dextend(g);
+            if(!isTurnOn) {
+                int temp1 = x;
+                x = y;
+                y = temp1;
+                int temp2 = width;
+                width = height;
+                height = temp2;
+                Graphics2Dextend g1 = new Graphics2Dextend(g);
 //            g1.setColor(Color.green);
-            g1.drawLine(x,y+height/2,x+width/4,y+height/2);
-            g1.drawLine(x+width/4,y+height/2,x+width*3/4,y+height/6);
-            g1.drawLine(x+width*3/4,y+height/3,x+width*3/4,y+height*2/3);
-            g1.drawLine(x+width*3/4,y+height/2,x+width,y+height/2);
+                g1.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g1.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 6);
+                g1.drawLine(x + width * 3 / 4, y + height / 3, x + width * 3 / 4, y + height * 2 / 3);
+                g1.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
+            else{
+                int temp1 = x;
+                x = y;
+                y = temp1;
+                int temp2 = width;
+                width = height;
+                height = temp2;
+                Graphics2Dextend g1 = new Graphics2Dextend(g);
+//            g1.setColor(Color.green);
+                g1.drawLine(x, y + height / 2, x + width / 4, y + height / 2);
+                g1.drawLine(x + width / 4, y + height / 2, x + width * 3 / 4, y + height / 2);
+                g1.drawLine(x + width * 3 / 4, y + height / 3, x + width * 3 / 4, y + height * 2 / 3);
+                g1.drawLine(x + width * 3 / 4, y + height / 2, x + width, y + height / 2);
+            }
         }
     }
 

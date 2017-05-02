@@ -43,23 +43,6 @@ public class SwitchUI extends NodeUI {
         }
     }
 
-//    /**
-//     * 根据鼠标的动作改变的开关的开闭以及是否旋转
-//     * @param gesture
-//     * @param e
-//     */
-//    public void performAction(int gesture, MouseEvent e){
-//        if(gesture==TWaverConst.MOUSE_LEFT_DOUBLE_CLICKED){
-//             if(switzh!=null) {
-//                 switzh.setTurnOn(!switzh.isTurnOn());
-//             }
-//        }
-//        if(gesture==TWaverConst.MOUSE_RIGHT_CLICKED){
-//            if(switzh!=null){
-//                switzh.setRotate(!switzh.isRotate());
-//            }
-//        }
-//    }
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);
@@ -82,7 +65,7 @@ public class SwitchUI extends NodeUI {
         if (!isRotate) {
             switzh.setToPoint(0, -height/2);
             switzh.setFromPoint(0, height/2-8);
-            if (turnOn) {
+            if (!turnOn) {
                 g.drawOval(x + width / 2 - width / 6, y, width / 6, width / 6);
                 g.drawOval(x + width / 2, y + height - width / 6, width / 6, width / 6);
                 g.drawLine(x + width, y, x + width*7 / 12, y + height - width / 6);
@@ -95,7 +78,7 @@ public class SwitchUI extends NodeUI {
         }else{
             switzh.setToPoint(-width/2, 0);
             switzh.setFromPoint(width/2, 0);
-            if (turnOn) {
+            if (!turnOn) {
                 g.drawOval(x, y+height/2-width/6, width / 6, width / 6);
                 g.drawOval(x+width-width/6, y+height/2-width/6, width / 6, width / 6);
                 g.drawLine(x+width/12, y+height/2, x + width-width/12, y+height/6);

@@ -1,7 +1,18 @@
 package View.Frame;
 
+import twaver.Element;
+import twaver.network.TNetwork;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,18 +30,18 @@ public class GeneratrixFrame extends JFrame {
     private JComboBox ee = new JComboBox();
     private JComboBox ff = new JComboBox();
     private JComboBox gg = new JComboBox();
-    private JComboBox hh = new JComboBox();
 
     private JButton vertify = new JButton("确定");
     private JButton cancel = new JButton("取消");
-    //参数map
-    private Map<String,Object> map = new HashMap<>();
 
-    public GeneratrixFrame(){
+    private SimpleDateFormat format =  new SimpleDateFormat("MM:dd hh:mm:ss");
+
+
+    public GeneratrixFrame(final Element element, final Connection connection){
         super();
-        //        this.map = (HashMap)element.getClientProperty("switchPara");
         this.setTitle("母线段参数设置");
         this.setResizable(false);
+        this.setVisible(true);
         this.setSize(600,400);
         this.setLocation((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2-300,(int)Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2-200);
         this.setLayout(new GridBagLayout());
@@ -60,7 +71,6 @@ public class GeneratrixFrame extends JFrame {
         JLabel e = new JLabel("所属区域:");
         JLabel f = new JLabel("所属厂站");
         JLabel g = new JLabel("电压等级");
-        JLabel h = new JLabel("所属容器");
 
         g1.insets = new Insets(10,0,10,5);
         g1.fill =GridBagConstraints.BOTH;
@@ -116,25 +126,121 @@ public class GeneratrixFrame extends JFrame {
         g1.gridwidth = 2;
         g1.gridx = 1;
         mainPanel.add(gg,g1);
-        g1.gridx = 3;
-        g1.gridwidth = 1;
-        mainPanel.add(h,g1);
-        g1.gridx = 4;
-        g1.gridwidth = 2;
-        mainPanel.add(hh,g1);
+
+        aa.setText(element.getName());
+        aa.setEditable(false);
+        bb.setEnabled(false);
+        bb.setText(element.getClientProperty("numberID").toString());
+        cc.setText("");
 
         dd.addItem("主母");
         dd.addItem("旁母");
+        dd.setSelectedItem("主母");
+
+        ee.addItem("武昌区");
+        ee.addItem("洪山区");
+        ee.addItem("蔡甸区");
+        ee.addItem("东湖风景区");
+        ee.addItem("江夏区");
+        ee.addItem("汉阳区");
+        ee.setSelectedItem("武昌区");
+        ff.addItem("武昌配电站");
+        ff.addItem("洪山配电站");
+        ff.addItem("蔡甸配电站");
+        ff.addItem("东湖配电站");
+        ff.addItem("江夏配电站");
+        ff.addItem("汉阳配电站");
+        ff.setSelectedItem("武昌配电站");
 
         gg.addItem("10kv");
         gg.addItem("35kv");
         gg.addItem("110kv");
         gg.addItem("220kv");
         gg.addItem("500kv");
+        gg.setSelectedItem("10kv");
 
+        /**
+         * 从数据库载入数据
+         */
+        loadData(element, connection);
+        //确定按钮触发的代码块
+        vertify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //更新母线电压等级数据
+                element.putClientProperty("rootVoltage",gg.getSelectedItem().toString());
+                //插入或更新数据
+                writeData(element,connection);
+                JOptionPane.showMessageDialog(null,"母线资料修改成功!");
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GeneratrixFrame.this.setVisible(false);
+            }
+        });
     }
-    public static void main(String[] args){
-        GeneratrixFrame frame = new GeneratrixFrame();
-        frame.setVisible(true);
+
+    /**
+     * 写入数据
+     * @param element
+     * @param connection
+     */
+    public void loadData(Element element,Connection connection){
+        if(element.getClientProperty("ID")==null)
+            return;
+        try {
+            String query = "Select * FROM mainbusbar WHERE BusbarID='"+element.getClientProperty("ID")+"'";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rt = stmt.executeQuery();
+            while(rt.next()){
+                aa.setText(rt.getString(2));
+                bb.setText(element.getClientProperty("numberID").toString());
+                cc.setText(rt.getString(3));
+                dd.setSelectedItem(rt.getObject(4));
+                ee.setSelectedItem(rt.getObject(5));
+                ff.setSelectedItem(rt.getObject(6));
+                gg.setSelectedItem(rt.getObject(7));
+            }
+            rt.close();
+            stmt.close();
+        }catch (Exception e){
+            System.out.println("母线数据载入错误");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 插入或更新数据
+     * @param element
+     * @param connection
+     */
+
+    public void writeData(Element element,Connection connection){
+        if(element.getClientProperty("numberID")!=null)
+            try {
+                element.putClientProperty("ID",format.format(new Date())+aa.getText().trim());
+                String query = "INSERT INTO mainbusbar VALUES ('"+element.getClientProperty("ID").toString()+"','"+aa.getText().trim()+"','"+cc.getText().trim()+"','"+dd.getSelectedItem().toString()+"','"+ee.getSelectedItem().toString()+"','"+
+                        ff.getSelectedItem().toString()+"','"+gg.getSelectedItem().toString()+"')";
+                Statement stmt = connection.createStatement();
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("母线数据插入错误");
+                e.printStackTrace();
+            }
+        else
+            try{
+                String query = "UPDATE mainbusbar SET PrimitiveName='"+aa.getText().trim()+"',Description='"+cc.getText().trim()+"',BusbarType='"+dd.getSelectedItem().toString()+"',BelongArea='"+ee.getSelectedItem().toString()+"',BelongStation='"+
+                        ff.getSelectedItem().toString()+"',VoltageLevel='"+gg.getSelectedItem().toString()+"' WHERE BusbarID='"+element.getClientProperty("ID")+"'";
+                Statement stmt = connection.createStatement();
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("母线数据写入错误");
+                e.printStackTrace();
+            }
+
     }
 }

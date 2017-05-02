@@ -1,22 +1,24 @@
 package Control;
 
-import View.StandChangeAUI;
+import View.DoubleRollChangeUI;
 import twaver.Link;
 import twaver.ResizableNode;
 import twaver.TWaverConst;
 
 import java.awt.*;
-import java.util.List;
+import java.awt.List;
+import java.util.*;
 
 /**
- * Created by Administrator on 2017-03-02.
+ * Created by user on 2017/4/28.
  */
-public class StandChangeA extends ResizableNode {
+public class RollChange extends ResizableNode {
     private boolean isRotate = false;
     private Point fromPoint = new Point(0,0);
     private Point toPoint = new Point(0,0);
-    public StandChangeA() {
-        super.setImage(null);
+
+    public RollChange() {
+        super();
         init();
     }
 
@@ -39,7 +41,7 @@ public class StandChangeA extends ResizableNode {
     }
 
     public String getUIClassID() {
-        return StandChangeAUI.class.getName();
+        return DoubleRollChangeUI.class.getName();
     }
     public void setFromPoint(int x,int y) {
         int oldx = this.fromPoint.x;
@@ -49,7 +51,7 @@ public class StandChangeA extends ResizableNode {
         this.firePropertyChange("fromPointX",oldx,this.fromPoint.x);
         this.firePropertyChange("fromPointY",oldy,this.fromPoint.y);
         if(this.getFromLinks()!=null) {
-            List<Link> fromLinks = this.getFromLinks();
+            java.util.List<Link> fromLinks = this.getFromLinks();
             for (Link link : fromLinks) {
                 link.putLinkFromXOffset(this.fromPoint.x);
                 link.putLinkFromYOffset(this.fromPoint.y);
@@ -75,7 +77,7 @@ public class StandChangeA extends ResizableNode {
         this.firePropertyChange("toPointX",oldx,this.toPoint.x);
         this.firePropertyChange("toPointY",oldy,this.toPoint.y);
         if(this.getToLinks()!=null) {
-            List<Link> toLinks = this.getToLinks();
+            java.util.List<Link> toLinks = this.getToLinks();
             for (Link link : toLinks) {
                 link.putLinkToXOffset(this.toPoint.x);
                 link.putLinkToYOffset(this.toPoint.y);
@@ -93,4 +95,3 @@ public class StandChangeA extends ResizableNode {
         }
     }
 }
-

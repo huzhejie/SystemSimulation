@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2017-02-16.
  */
-public class ThreeVolumeChange extends DoubleRollChange {
+public class ThreeVolumeChange extends RollChange {
     public ThreeVolumeChange() {
         super();
         init();

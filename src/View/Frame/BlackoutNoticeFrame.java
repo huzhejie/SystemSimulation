@@ -44,7 +44,7 @@ public class BlackoutNoticeFrame extends JFrame {
     private JLabel suffixLabel = new JLabel("#");
     private JButton output = new JButton("输出");
     private SimpleDateFormat format_ymd =  new SimpleDateFormat("yyyyMMdd    ");
-    private SimpleDateFormat format =  new SimpleDateFormat("yyyyMMdd    ");
+//    private SimpleDateFormat format =  new SimpleDateFormat("yyyyMMdd    ");
 
 
     /**
@@ -179,7 +179,6 @@ public class BlackoutNoticeFrame extends JFrame {
         datePanel.add(suffixLabel,g3);
         g3.gridx = 6;
         datePanel.add(output,g3);
-//        System.out.println(format.format(new Date()));
         dateField.setText(format_ymd.format(new Date()));
 
         //中间的mainPanel布局
@@ -367,28 +366,6 @@ public class BlackoutNoticeFrame extends JFrame {
         output.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                Map<String,Object> datamap = new HashMap();
-//                datamap.put("noticeId",dateField.getText().trim());
-//                datamap.put("startTime",sdf.parse(sdf.format(startPanel.getDate()))+" "+startSpinner.getValue().toString());
-//                datamap.put("endTime",sdf.format(endPanel.getDate())+" "+endSpinner.getValue().toString());
-//                datamap.put("type",typeChooser.getSelectedItem().toString().trim());
-//                datamap.put("companyName",name.getText().trim());
-//                datamap.put("deadLine",line.getText().trim());
-//                datamap.put("deadCause",deadCause.getText().trim());
-//                datamap.put("deadZone",zone.getText().trim());
-//                datamap.put("remark",remark.getText().trim());
-//                datamap.put("sender",fromUserName.getText().trim());
-//                datamap.put("receiver",toUserName.getText().trim());
-//                datamap.put("sendTime",sdf.parse(sdf.format(send.getDate()))+sendSpinner.getValue().toString());
-//                datamap.put("receiveTime",sdf.format(recieve.getDate())+recieveSpinner.getValue().toString());
-//                datamap.put("checker",checkUserName.getText().trim());
-//                datamap.put("checkTime",sdf.parse(sdf.format(check.getDate()))+checkSpinner.getValue().toString());
-//                datamap.put("baseId",baseId.getText().trim());
-//
-//                datamap.put("Id","1");
-//                datamap.put("userName","2");
-//                datamap.put("contactor","123");
-//                datamap.put("teleNo","dadada");
 
 
                 String filePath = "D:/停电通知"+dateField.getText().trim()+".docx";

@@ -1,5 +1,6 @@
 package SystemSimulation;
 
+import Utils.Topology;
 import View.DrawPanel;
 import View.Frame.ExportImageFrame;
 import View.Frame.OpenFrame;
@@ -246,25 +247,9 @@ public class MenuBar extends JMenuBar {
 
                         try {
                             DataBoxOutputSetting ex = new DataBoxOutputSetting();
-//                            ex.setWithElementId(this.F);
                             ex.setWithAlarmState(true);
                             ex.setWithLayers(true);
-//                            if(this.B) {
-//                                TSubNetwork images = network.getCurrentSubNetwork();
-//                                ex.setElementFilter(new SubNetworkPersistentFilter(images));
-//                            }
-//
-//
-//                                HashMap images1 = new HashMap();
-//                                Iterator it = network.getDataBox().iterator();
-//
-//                                while(it.hasNext()) {
-//                                    Element element = (Element)it.next();
-//                                    MenuBar.this.A(images1, element.getImageURL());
-//                                    MenuBar.this.A(images1, element.getIconURL());
-//                                }
-//
-//                                ex.setImages(images1);
+
 
                             network.getDataBox().output(fileName, ex);
                         } catch (IOException exx) {
@@ -336,6 +321,13 @@ public class MenuBar extends JMenuBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                new VoltageColorFrame(network);
+            }
+        });
+        //拓扑当前项目
+        item14.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Topology(network);
             }
         });
 

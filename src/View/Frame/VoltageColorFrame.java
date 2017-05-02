@@ -87,12 +87,12 @@ public class VoltageColorFrame extends JFrame {
             switch (i) {
                 case 0:
                     vector.addElement("0kV");
-                    vector.addElement(network.getVoltageColor_0());
+//                    vector.addElement(network.getVoltageColor_0());
                     vector.addElement("中性点");
                     break;
                 case 1:
                     vector.addElement("6kV");
-                    vector.addElement(network.getVoltageColor_6());
+//                    vector.addElement(network.getVoltageColor_6());
                     vector.addElement("交流6kV");
                     break;
                 case 2:
@@ -122,7 +122,7 @@ public class VoltageColorFrame extends JFrame {
                     break;
                 case 7:
                     vector.addElement("750kV");
-                    vector.addElement(network.getVoltageColor_750());
+//                    vector.addElement(network.getVoltageColor_750());
                     vector.addElement("交流750kV");
                     break;
             }
@@ -138,14 +138,14 @@ public class VoltageColorFrame extends JFrame {
         vertify.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                network.setVoltageColor_0((Color)(model.getValueAt(0,2)));
-                network.setVoltageColor_6((Color)(model.getValueAt(1,2)));
+//                network.setVoltageColor_0((Color)(model.getValueAt(0,2)));
+//                network.setVoltageColor_6((Color)(model.getValueAt(1,2)));
                 network.setVoltageColor_10((Color)(model.getValueAt(2,2)));
                 network.setVoltageColor_35((Color)(model.getValueAt(3,2)));
                 network.setVoltageColor_110((Color)(model.getValueAt(4,2)));
                 network.setVoltageColor_220((Color)(model.getValueAt(5,2)));
                 network.setVoltageColor_500((Color)(model.getValueAt(6,2)));
-                network.setVoltageColor_750((Color)(model.getValueAt(7,2)));
+//                network.setVoltageColor_750((Color)(model.getValueAt(7,2)));
                 VoltageColorFrame.this.setVisible(false);
             }
         });

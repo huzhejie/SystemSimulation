@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Created by Administrator on 2017-03-01.
+ * 接地开关
  */
 public class GroundSwitch extends ResizableNode {
     private boolean turnOn = false;
@@ -22,7 +23,7 @@ public class GroundSwitch extends ResizableNode {
         init();
     }
     public void init(){
-        this.putRenderColor(Color.GREEN);
+        this.putRenderColor(Color.WHITE);
         this.putBorderColor(Color.black);
         this.putBorderInsets(12);
         this.putBorderStroke(TWaverConst.STROKE_SQUARE_THINNEST);

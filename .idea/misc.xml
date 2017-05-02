@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="E:/JBox2DTrade/JBox2DTrade/JBox2D/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="E:/JBox2DTrade/JBox2DTrade/JBox2D/jbox2d-library/pom.xml" />
+        <option value="E:/JBox2DTrade/JBox2DTrade/JBox2D/jbox2d-serialization/pom.xml" />
+        <option value="E:/JBox2DTrade/JBox2DTrade/JBox2D/jbox2d-testbed-jogl/pom.xml" />
+        <option value="E:/JBox2DTrade/JBox2DTrade/JBox2D/jbox2d-testbed/pom.xml" />
+        <option value="E:/JBox2DTrade/JBox2DTrade/JBox2D/pom.xml" />
+      </set>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" default="false" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>

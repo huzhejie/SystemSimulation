@@ -1,7 +1,16 @@
 package View.Frame;
 
+import twaver.Element;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,16 +27,17 @@ public class EarthSwitchFrame extends JFrame {
     private JComboBox  dd = new JComboBox();
     private JComboBox ee = new JComboBox();
     private JComboBox ff = new JComboBox();
-    private JComboBox gg = new JComboBox();
+//    private JComboBox gg = new JComboBox();
 
     private JButton vertify = new JButton("确定");
     private JButton cancel = new JButton("取消");
-    //参数map
-    private Map<String,Object> map = new HashMap<>();
 
-    public EarthSwitchFrame(){
+    private SimpleDateFormat format =  new SimpleDateFormat("MM:dd hh:mm:ss");
+
+
+    public EarthSwitchFrame(final Element element, final Connection connection){
         super();
-        //        this.map = (HashMap)element.getClientProperty("switchPara");
+        this.setVisible(true);
         this.setTitle("接地开关参数设置");
         this.setResizable(false);
         this.setSize(600,400);
@@ -58,7 +68,7 @@ public class EarthSwitchFrame extends JFrame {
         JLabel d = new JLabel("电压等级:");
         JLabel e = new JLabel("所属区域:");
         JLabel f = new JLabel("所属厂站");
-        JLabel g = new JLabel("配电单元");
+//        JLabel g = new JLabel("配电单元");
 
         g1.insets = new Insets(10,0,10,5);
         g1.fill =GridBagConstraints.BOTH;
@@ -107,23 +117,130 @@ public class EarthSwitchFrame extends JFrame {
         g1.gridx = 4;
         g1.gridwidth = 2;
         mainPanel.add(ff,g1);
-        g1.gridy = 3;
-        g1.gridx = 0;
-        g1.gridwidth = 1;
-        mainPanel.add(g,g1);
-        g1.gridwidth = 2;
-        g1.gridx = 1;
-        mainPanel.add(gg,g1);
+//        g1.gridy = 3;
+//        g1.gridx = 0;
+//        g1.gridwidth = 1;
+//        mainPanel.add(g,g1);
+//        g1.gridwidth = 2;
+//        g1.gridx = 1;
+//        mainPanel.add(gg,g1);
+
+        aa.setEditable(false);
+        bb.setEditable(false);
+        aa.setText(element.getName());
+        if(element.getClientProperty("numberID")!=null)
+            bb.setText(element.getClientProperty("numberID").toString());
+        else
+            bb.setText("");
 
         dd.addItem("10kv");
         dd.addItem("35kv");
         dd.addItem("110kv");
         dd.addItem("220kv");
         dd.addItem("500kv");
+        dd.setSelectedItem("10kv");
+
+        ee.addItem("武昌区");
+        ee.addItem("洪山区");
+        ee.addItem("蔡甸区");
+        ee.addItem("东湖风景区");
+        ee.addItem("江夏区");
+        ee.addItem("汉阳区");
+        ee.setSelectedItem("武昌区");
+        ff.addItem("武昌配电站");
+        ff.addItem("洪山配电站");
+        ff.addItem("蔡甸配电站");
+        ff.addItem("东湖配电站");
+        ff.addItem("江夏配电站");
+        ff.addItem("汉阳配电站");
+        ff.setSelectedItem("武昌配电站");
+
+
+        /**
+         * 载入数据
+         */
+        loadData(element,connection);
+
+        vertify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //更新开关电压等级数据
+                element.putClientProperty("rootVoltage",dd.getSelectedItem());
+                //插入或更新数据
+                writeData(element,connection);
+                JOptionPane.showMessageDialog(null,"接地开关资料修改成功!");
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EarthSwitchFrame.this.setVisible(false);
+            }
+        });
+
 
     }
-    public static void main(String[] args){
-        EarthSwitchFrame frame = new EarthSwitchFrame();
-        frame.setVisible(true);
+    /**
+     * 写入数据
+     * @param element
+     * @param connection
+     */
+    public void loadData(Element element,Connection connection){
+        if(element.getClientProperty("ID")==null)
+            return;
+        try {
+            Statement stmt = connection.createStatement();
+            String query = "Select * FROM groudswitch WHERE DeviceID='"+element.getClientProperty("ID")+"'";
+            ResultSet rt = stmt.executeQuery(query);
+            while(rt.next()){
+                aa.setText(rt.getString(2));
+                bb.setText(element.getClientProperty("numberID").toString());
+                cc.setText(rt.getString(3));
+                dd.setSelectedItem(rt.getObject(4));
+                ee.setSelectedItem(rt.getObject(5));
+                ff.setSelectedItem(rt.getObject(6));
+
+            }
+            rt.close();
+            stmt.close();
+        }catch (Exception e){
+            System.out.println("接地开关数据载入错误");
+            e.printStackTrace();
+        }
     }
+
+    /**
+     * 插入或更新数据
+     * @param element
+     * @param connection
+     */
+
+    public void writeData(Element element,Connection connection){
+        if(element.getClientProperty("numberID")!=null)
+            try {
+                element.putClientProperty("ID",format.format(new Date())+aa.getText().trim());
+                Statement stmt = connection.createStatement();
+                String query = "INSERT INTO groudswitch(DeviceID,PrimitiveName,Description,VoltageLevel,BelongArea,BelongStation)"+
+                        "VALUES ('"+element.getClientProperty("ID")+"','"+aa.getText().trim()+"','"+cc.getText().trim()+"','"+dd.getSelectedItem().toString()+"','"+ee.getSelectedItem().toString()+"','"+
+                        ff.getSelectedItem().toString()+"')";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("接地开关数据插入错误");
+                e.printStackTrace();
+            }
+        else
+            try{
+                Statement stmt = connection.createStatement();
+                String query = "UPDATE groudswitch SET PrimitiveName='"+aa.getText().trim()+"',Description='"+cc.getText().trim()+"',VoltageLevel='"+dd.getSelectedItem().toString()+"',BelongArea='"+ee.getSelectedItem().toString()+"',BelongStation='"+
+                        ff.getSelectedItem().toString()+"' WHERE DeviceID='"+element.getClientProperty("ID")+"'";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("接地开关数据写入错误");
+                e.printStackTrace();
+            }
+
+    }
+
 }

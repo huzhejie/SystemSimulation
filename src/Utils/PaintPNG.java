@@ -19,15 +19,14 @@ public class PaintPNG {
         g.dispose();
         g = image.createGraphics();
         //画图
-        g.setColor(new Color(100,100,100));
-        g.drawOval(width/2-width/6, 0, width/6, width/6);
-        g.drawOval(width/2, height-10, width/6, width/6);
-        g.drawLine(width/2, 0, width/2, height-10);
+        g.setColor(Color.green.darker().darker());
+        g.drawLine(width/2,0,width/2,height);
+
 
         //画图结束
         g.dispose();
         try {
-            ImageIO.write(image, "png", new File("switch.png"));
+            ImageIO.write(image, "png", new File("trunk.png"));
         }catch (Exception e){
             e.printStackTrace();
         }

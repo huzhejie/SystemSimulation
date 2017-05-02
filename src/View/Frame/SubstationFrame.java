@@ -1,7 +1,16 @@
 package View.Frame;
 
+import twaver.Element;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,12 +31,12 @@ public class SubstationFrame extends JFrame{
 
     private JButton vertify = new JButton("确定");
     private JButton cancel = new JButton("取消");
-    //参数map
-    private Map<String,Object> map = new HashMap<>();
 
-    public SubstationFrame(){
+    private SimpleDateFormat format =  new SimpleDateFormat("MM:dd hh:mm:ss");
+
+    public SubstationFrame(final Element element, final Connection connection){
         super();
-        //        this.map = (HashMap)element.getClientProperty("switchPara");
+        this.setVisible(true);
         this.setTitle("厂站参数设置");
         this.setResizable(false);
         this.setSize(600,400);
@@ -59,7 +68,7 @@ public class SubstationFrame extends JFrame{
         JLabel e = new JLabel("电压等级:");
         JLabel f = new JLabel("电源标识:");
         JLabel g = new JLabel("所属区域:");
-        JButton h = new JButton("管理");
+//        JButton h = new JButton("管理");
 
         g1.insets = new Insets(10,0,10,5);
         g1.fill =GridBagConstraints.BOTH;
@@ -115,19 +124,119 @@ public class SubstationFrame extends JFrame{
         g1.gridwidth = 2;
         g1.gridx = 1;
         mainPanel.add(gg,g1);
-        g1.gridx = 3;
-        g1.gridwidth = 1;
-        mainPanel.add(h,g1);
+//        g1.gridx = 3;
+//        g1.gridwidth = 1;
+//        mainPanel.add(h,g1);
+
+        aa.setText(element.getName());
+        aa.setEditable(false);
+        if(element.getClientProperty("numberID")!=null)
+            bb.setText(element.getClientProperty("numberID").toString());
+        else
+            bb.setText("");
+        bb.setEditable(false);
 
         ee.addItem("10kv");
         ee.addItem("35kv");
         ee.addItem("110kv");
         ee.addItem("220kv");
         ee.addItem("500kv");
+        ee.setSelectedItem("10kv");
+
+        gg.addItem("武昌区");
+        gg.addItem("洪山区");
+        gg.addItem("蔡甸区");
+        gg.addItem("东湖风景区");
+        gg.addItem("江夏区");
+        gg.addItem("汉阳区");
+        gg.setSelectedItem("武昌区");
+
+
+        /**
+         * 载入数据
+         */
+        loadData(element,connection);
+
+        vertify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //更新开关电压等级数据
+                element.putClientProperty("rootVoltage",ee.getSelectedItem());
+                //插入或更新数据
+                writeData(element,connection);
+                JOptionPane.showMessageDialog(null,"变电所资料修改成功!");
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SubstationFrame.this.setVisible(false);
+            }
+        });
+
+
 
     }
-    public static void main(String[] args){
-        SubstationFrame frame = new SubstationFrame();
-        frame.setVisible(true);
+    /**
+     * 写入数据
+     * @param element
+     * @param connection
+     */
+    public void loadData(Element element,Connection connection){
+        if(element.getClientProperty("numberID")==null)
+            return;
+        try {
+            Statement stmt = connection.createStatement();
+            String query = "Select * FROM TABLE substation WHERE FactoryID='"+element.getClientProperty("ID")+"'";
+            ResultSet rt = stmt.executeQuery(query);
+            while(rt.next()){
+                aa.setText(rt.getString(2));
+                bb.setText(element.getClientProperty("numberID").toString());
+                cc.setText(rt.getString(3));
+                dd.setText(rt.getString(4));
+                ee.setSelectedItem(rt.getObject(5));
+                ff.setText(rt.getString(6));
+                gg.setSelectedItem(rt.getObject(7));
+            }
+            rt.close();
+            stmt.close();
+        }catch (Exception e){
+            System.out.println("变电所数据载入错误");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 插入或更新数据
+     * @param element
+     * @param connection
+     */
+
+    public void writeData(Element element,Connection connection){
+        if(element.getClientProperty("numberID")!=null)
+            try {
+            element.putClientProperty("ID",format.format(new Date())+aa.getText().trim());
+                Statement stmt = connection.createStatement();
+                String query = "INSERT INTO substation(FactoryID,PrimitiveName,Description,ESRTU,VoltageLevel,PowerTag,BelongArea)"+
+                        "VALUES ('"+element.getClientProperty("ID")+"','"+aa.getText().trim()+"','"+cc.getText().trim()+"','"+dd.getText().trim()+"','"+ee.getSelectedItem().toString()+"','"+
+                        ff.getText().trim()+"','"+gg.getSelectedItem().toString()+"')";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("变电所数据插入错误");
+                e.printStackTrace();
+            }
+        else
+            try{
+                Statement stmt = connection.createStatement();
+                String query = "UPDATE substation SET PrimitiveName='"+aa.getText().trim()+"',Description='"+cc.getText().trim()+"',ESRTU='"+dd.getText().trim()+"',VoltageLevel='"+ee.getSelectedItem().toString()+"',BelongArea='"+gg.getSelectedItem().toString()+"',PowerTag='"+
+                        ff.getText().trim()+"' WHERE FactoryID='"+element.getClientProperty("ID")+"'";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("变电所数据写入错误");
+                e.printStackTrace();
+            }
+
     }
 }

@@ -1,8 +1,6 @@
 package SystemSimulation;
 
-import Control.ComponentDataBox;
-import Control.ComponentIndexSet;
-import Control.DrawPanelDataBox;
+import Control.*;
 import View.DrawPanel;
 import View.PropertyPanel;
 import twaver.*;
@@ -14,6 +12,8 @@ import twaver.tree.TTree;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
@@ -22,11 +22,13 @@ import java.util.List;
  * Created by huzhejie on 2017/2/2.
  */
 public class Editor {
-    public static String temp = "";//存储元件名称
+    //存储元件名称
+    public static String temp = "";
     //存储图元类别的名称
     public static ComponentIndexSet indexSet = new ComponentIndexSet();
 
     public static void main(final String[] args ){
+
         final DrawPanelDataBox box = new DrawPanelDataBox();
         final ComponentDataBox componentBox = new ComponentDataBox();
         final DrawPanel network = new DrawPanel(box);
@@ -38,19 +40,121 @@ public class Editor {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Element element;
+//                System.out.println(network.getDataBox().getLastSelectedElement().getID());
                 if(e.getButton()==MouseEvent.BUTTON1){
-                    System.out.println(temp);
+//                    System.out.println(temp);
                     switch(temp){
                         case "":
                             break;
                         default:
                             element = componentBox.getElementByName(temp).copy();
-                            if(element!=null&&!indexSet.getSet().contains(element.getName())) {
+                            int id;
+//                            if(element instanceof Trunk) {
+//                                ((ArrayList<Element>)network.getClientProperty("rootList")).add(element);
+//                            }
+//                            else if(element instanceof DistributionStation){
+//                                ((ArrayList<Element>)network.getClientProperty("rootList")).add(element);
+//                            }
+                            if(element!=null&&!indexSet.getSet().equals(element.getName())) {
                                 double zoom = network.getZoomer().getZoom();
                                 element.setLocation(e.getX()/zoom,e.getY()/zoom);
                                 box.addElement(element);
                                 temp = "";
                             }
+                            Class clazz = null;
+                            switch (element.getName()){
+                                case "母线":
+                                    clazz = Trunk.class;
+                                    break;
+                                case "普通开关":
+                                    clazz = Switch.class;
+                                    break;
+                                case "双卷变":
+                                    clazz = DoubleRollChange.class;
+                                    break;
+                                case "三卷变":
+                                    clazz = ThreeVolumeChange.class;
+                                    break;
+                                case "断路器A":
+                                    clazz = BreakerA.class;
+                                    break;
+                                case "断路器B":
+                                    clazz = BreakerB.class;
+                                    break;
+                                case "真空开关":
+                                    clazz = VacuumSwitch.class;
+                                    break;
+                                case "接电":
+                                    clazz = Junction.class;
+                                    break;
+                                case "变电站":
+                                    clazz = VariableField.class;
+                                    break;
+                                case "保险丝":
+                                    clazz = Fuse.class;
+                                    break;
+                                case "发电机":
+                                    clazz = Alternator.class;
+                                    break;
+                                case "接地":
+                                    clazz = Grounded.class;
+                                    break;
+                                case "搭接点":
+                                    clazz = LapPoints.class;
+                                    break;
+                                case "接地开关":
+                                    clazz = GroundSwitch.class;
+                                    break;
+                                case "避雷器A":
+                                    clazz = LightningArrester.class;
+                                    break;
+                                case "避雷器B":
+                                    clazz = LightningRod.class;
+                                    break;
+                                case "PTA":
+                                    clazz = PTA.class;
+                                    break;
+                                case "PTB":
+                                    clazz = PT.class;
+                                    break;
+                                case "站用变A":
+                                    clazz = StandChangeA.class;
+                                    break;
+                                case "站用变B":
+                                    clazz = StandChange.class;
+                                    break;
+                                case "配电站":
+                                    clazz = DistributionStation.class;
+                                    break;
+                                case "箱变":
+                                    clazz = BoxChange.class;
+                                    break;
+                                case "熔断器":
+                                    clazz = Fuses.class;
+                                    break;
+                                case "柱断路器":
+                                    clazz = ColumnCircuitBreaker.class;
+                                    break;
+                                case "配电断路器":
+                                    clazz = PowerDisCircuitBreakers.class;
+                                    break;
+                                case "柱隔离开关":
+                                    clazz = ColumnIsolationSwitch.class;
+                                    break;
+                                case "配电隔离开关":
+                                    clazz = IsolationOfPowerDis.class;
+                                    break;
+                                case "电容器":
+                                    clazz = CapacitorA.class;
+                                    break;
+                            }
+                            if(network.getDataBox().getElementsByType(clazz)==null)
+                                id = 1;
+                            else
+                                id = network.getDataBox().getElementsByType(clazz).size();
+                            element.setName(element.getName()+id);
+                            element.putClientProperty("numberID",id);
+//                            System.out.println(element.getID());
                             break;
                     }
                 }

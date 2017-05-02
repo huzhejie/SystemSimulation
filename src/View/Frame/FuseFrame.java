@@ -1,7 +1,16 @@
 package View.Frame;
 
+import twaver.Element;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,16 +28,16 @@ public class FuseFrame extends JFrame {
     private JComboBox ee = new JComboBox();
     private JComboBox ff = new JComboBox();
     private JTextField gg = new JTextField ();
-    private JComboBox hh = new JComboBox();
+//    private JComboBox hh = new JComboBox();
 
     private JButton vertify = new JButton("确定");
     private JButton cancel = new JButton("取消");
-    //参数map
-    private Map<String,Object> map = new HashMap<>();
 
-    public FuseFrame(){
+    private SimpleDateFormat format =  new SimpleDateFormat("MM:dd hh:mm:ss");
+
+    public FuseFrame(final Element element,final Connection connection){
         super();
-        //        this.map = (HashMap)element.getClientProperty("switchPara");
+        this.setVisible(true);
         this.setTitle("熔断器参数设置");
         this.setResizable(false);
         this.setSize(600,400);
@@ -60,7 +69,7 @@ public class FuseFrame extends JFrame {
         JLabel e = new JLabel("所属区域:");
         JLabel f = new JLabel("所属厂站:");
         JLabel g = new JLabel("熔断电流:");
-        JLabel h = new JLabel("配电单元:");
+//        JLabel h = new JLabel("配电单元:");
         JLabel i = new JLabel("A");
         i.setHorizontalAlignment(JTextField.LEFT);
 
@@ -123,22 +132,126 @@ public class FuseFrame extends JFrame {
         g1.gridwidth = 1;
         g1.ipadx = 0;
         mainPanel.add(i,g1);
-        g1.gridx = 3;
-        g1.gridwidth = 1;
-        mainPanel.add(h,g1);
-        g1.gridx = 4;
-        g1.gridwidth = 2;
-        mainPanel.add(hh,g1);
+//        g1.gridx = 3;
+//        g1.gridwidth = 1;
+//        mainPanel.add(h,g1);
+//        g1.gridx = 4;
+//        g1.gridwidth = 2;
+//        mainPanel.add(hh,g1);
+
+        aa.setEditable(false);
+        bb.setEditable(false);
+        aa.setText(element.getName());
+        if(element.getClientProperty("NumberID")!=null)
+            bb.setText(element.getClientProperty("NumberID").toString());
+        else
+            bb.setText("");
 
         dd.addItem("10kv");
         dd.addItem("35kv");
         dd.addItem("110kv");
         dd.addItem("220kv");
         dd.addItem("500kv");
+        dd.setSelectedItem("10kv");
+
+        ee.addItem("武昌区");
+        ee.addItem("洪山区");
+        ee.addItem("蔡甸区");
+        ee.addItem("东湖风景区");
+        ee.addItem("江夏区");
+        ee.addItem("汉阳区");
+        ee.setSelectedItem("武昌区");
+        ff.addItem("武昌配电站");
+        ff.addItem("洪山配电站");
+        ff.addItem("蔡甸配电站");
+        ff.addItem("东湖配电站");
+        ff.addItem("江夏配电站");
+        ff.addItem("汉阳配电站");
+        ff.setSelectedItem("武昌配电站");
+        /**
+         * 载入数据
+         */
+        loadData(element,connection);
+
+        vertify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //更新开关电压等级数据
+                element.putClientProperty("rootVoltage",dd.getSelectedItem());
+                //插入或更新数据
+                writeData(element,connection);
+                JOptionPane.showMessageDialog(null,"熔断器资料修改成功!");
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FuseFrame.this.setVisible(false);
+            }
+        });
 
     }
-    public static void main(String[] args){
-        FuseFrame frame = new FuseFrame();
-        frame.setVisible(true);
+    /**
+     * 写入数据
+     * @param element
+     * @param connection
+     */
+    public void loadData(Element element, Connection connection){
+        if(element.getClientProperty("ID")==null)
+            return;
+        try {
+            Statement stmt = connection.createStatement();
+            String query = "Select * FROMfuse WHERE DeviceID='"+element.getClientProperty("ID")+"'";
+            ResultSet rt = stmt.executeQuery(query);
+            while(rt.next()){
+                aa.setText(rt.getString(2));
+                bb.setText(element.getClientProperty("numberID").toString());
+                cc.setText(rt.getString(3));
+                dd.setSelectedItem(rt.getObject(4));
+                ee.setSelectedItem(rt.getObject(5));
+                ff.setSelectedItem(rt.getObject(6));
+                gg.setText(rt.getString(7));
+            }
+            rt.close();
+            stmt.close();
+        }catch (Exception e){
+            System.out.println("熔断器数据载入错误");
+            e.printStackTrace();
+        }
     }
+
+    /**
+     * 插入或更新数据
+     * @param element
+     * @param connection
+     */
+
+    public void writeData(Element element,Connection connection){
+        if(element.getClientProperty("numberID")!=null)
+            try {
+                element.putClientProperty("ID",format.format(new Date())+aa.getText().trim());
+                Statement stmt = connection.createStatement();
+                String query = "INSERT INTO fuse(DeviceID,PrimitiveName,Description,VoltageLevel,BelongArea,BelongStation,FuseCurrent)"+
+                        "VALUES ('"+element.getClientProperty("ID").toString()+"','"+aa.getText().trim()+"','"+cc.getText().trim()+"','"+dd.getSelectedItem().toString()+"','"+ee.getSelectedItem().toString()+"','"+
+                        ff.getSelectedItem().toString()+"',"+Double.parseDouble(gg.getText().trim())+")";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("熔断器数据插入错误");
+                e.printStackTrace();
+            }
+        else
+            try{
+                Statement stmt = connection.createStatement();
+                String query = "UPDATE fuse SET PrimitiveName='"+aa.getText().trim()+"',Description='"+cc.getText().trim()+"',VoltageLevel='"+dd.getSelectedItem().toString()+"',BelongArea='"+ee.getSelectedItem().toString()+"',BelongStation='"+
+                        ff.getSelectedItem().toString()+"',FuseCurrent="+Double.parseDouble(gg.getText().trim())+" WHERE DeviceID='"+element.getClientProperty("ID")+"'";
+                stmt.execute(query);
+                stmt.close();
+            }catch (Exception e){
+                System.out.println("熔断器数据写入错误");
+                e.printStackTrace();
+            }
+
+    }
+
 }

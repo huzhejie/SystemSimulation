@@ -21,7 +21,7 @@ public class CapacitorA extends ResizableNode {
     }
 
     public void init() {
-        this.putRenderColor(Color.GREEN);
+        this.putRenderColor(Color.WHITE);
         this.putBorderColor(Color.black);
         this.putBorderInsets(12);
         this.putBorderStroke(TWaverConst.STROKE_SQUARE_THINNEST);
