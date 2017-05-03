@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Created by Administrator on 2017-03-02.
+ * 配电站
  */
 public class DistributionStation extends ResizableNode {
     private boolean isRotate = false;

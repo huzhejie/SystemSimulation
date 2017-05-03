@@ -1,5 +1,7 @@
 package Utils;
 
+import twaver.TWaverConst;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,14 +21,19 @@ public class PaintPNG {
         g.dispose();
         g = image.createGraphics();
         //画图
-        g.setColor(Color.green.darker().darker());
-        g.drawLine(width/2,0,width/2,height);
+        Font ValueFont = new Font("黑体", Font.BOLD, 8);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);
+
+        g.setColor(Color.BLACK);
+        g.setFont(ValueFont);
+        g.drawString("用电用户",  0,  height / 2);
 
 
         //画图结束
         g.dispose();
         try {
-            ImageIO.write(image, "png", new File("trunk.png"));
+            ImageIO.write(image, "png", new File("mainUser.png"));
         }catch (Exception e){
             e.printStackTrace();
         }

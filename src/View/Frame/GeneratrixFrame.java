@@ -172,6 +172,7 @@ public class GeneratrixFrame extends JFrame {
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"母线资料修改成功!");
+                GeneratrixFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

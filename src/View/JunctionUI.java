@@ -36,13 +36,7 @@ public class JunctionUI extends NodeUI {
             return this.defaultBorder;
         }
     }
-    public void performAction(int gesture, MouseEvent e){
-        if(gesture== TWaverConst.MOUSE_RIGHT_CLICKED){
-            if(junction !=null){
-                junction.setRotate(!junction.isRotate());
-            }
-        }
-    }
+
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);
@@ -51,7 +45,6 @@ public class JunctionUI extends NodeUI {
         //get position
         final Point location = junction.getLocation();
         final Dimension size = junction.getBounds().getSize();
-        boolean isRotate = junction.isRotate();
         int x = location.x;
         int y = location.y;
         int width = size.width;

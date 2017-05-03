@@ -19,14 +19,21 @@ import java.util.List;
 public class Topology {
     private DrawPanel network = null;
     private Color voltageColor = null;
+    private ArrayList<Data> dataList = null;
+    private Double distance = 0.00d;
+    private Double power = 0.00d;
+    private static Element root = null;
     public Topology(DrawPanel network){
         this.network = network;
+        network.putClientProperty("switchList",new ArrayList<Element>());
+        dataList = new ArrayList<Data>();
+        network.putClientProperty("dataList",dataList);
         ArrayList<Element> rootList= new ArrayList<>();
-        for(Element element:(ArrayList<Element>)network.getDataBox().getAllElements()) {
-            if (element instanceof Trunk) {
+        for(Element element:(ArrayList<Element>)network.getDataBox().getAllElements()){
+            if (element instanceof Trunk||element instanceof DistributionStation||
+                    element instanceof Alternator||element instanceof BoxChange
+                    ||element instanceof VariableField) {
                rootList.add(element);
-            } else if (element instanceof DistributionStation) {
-                rootList.add(element);
             }
         }
         if(rootList.size()==0){
@@ -36,6 +43,7 @@ public class Topology {
         else
             network.putClientProperty("rootList",rootList);
         for(Element element: rootList) {
+            root = element;
             int rootVoltage = Integer.parseInt(element.getClientProperty("rootVoltage").toString().replaceAll("kv",""));
             voltageColor = network.getVoltageColor(rootVoltage);
             deepFirstSearch((Node)element,voltageColor,rootVoltage);
@@ -44,28 +52,46 @@ public class Topology {
     /**
      *深度优先搜索算法
      */
-    public void deepFirstSearch(Node root,Color color,int rootVolatage){
+    public void deepFirstSearch(Node node,Color color,int rootVolatage){
         if(rootVolatage==0)
             return;
-        if(root instanceof Switch){
-            if(((Switch) root).isTurnOn())
+        if(node instanceof Switch){
+            if(!((Switch) node).isTurnOn()) {
+                for(int i = 0;i<node.getToLinks().size();i++){
+                    Link link = (Link)node.getToLinks().get(i);
+                    if(link.getClientProperty("current")!=null)
+                        power = power+Double.parseDouble(link.getClientProperty("rootVoltage").toString().replaceAll("kv",""))
+                    *Double.parseDouble(link.getClientProperty("current").toString());
+                }
+                Data data = new Data(distance,power,(Switch)node,this.root,null);
+                dataList.add(data);
+                return;
+            }
+        }
+        else if(node instanceof GroundSwitch){
+            if(!((GroundSwitch)node).isTurnOn())
                 return;
         }
-        else if(root instanceof GroundSwitch){
-            if(((GroundSwitch)root).isTurnOn())
-                return;
-        }
-        root.putRenderColor(color);
-        if(root.getFromLinks()==null)
+        if(node instanceof Junction){}
+        else
+           node.putRenderColor(color);
+        if(node.getFromLinks()==null)
             return;
-        List lineList = root.getFromLinks();
+        List lineList = node.getFromLinks();
         Iterator it = lineList.iterator();
         while(it.hasNext()){
             Link line = (Link)it.next();
             line.putRenderColor(color);
+            if(line.getClientProperty("length")!=null){
+                distance=distance+Double.parseDouble(line.getClientProperty("length").toString());
+            }
             Node tempNode = line.getTo();
-            if(tempNode instanceof RollChange) {
+            if(tempNode instanceof RollChange
+                    ||tempNode instanceof StandChange) {
                 rootVolatage = (int)(rootVolatage*((Double)tempNode.getClientProperty("ratio")));
+                deepFirstSearch(tempNode,color,rootVolatage);
+            }
+            else if(tempNode instanceof Junction){
                 deepFirstSearch(tempNode,color,rootVolatage);
             }
             else {

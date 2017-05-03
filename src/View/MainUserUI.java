@@ -1,6 +1,7 @@
 package View;
 
-import Control.VariableField;
+import Control.MainUser;
+import twaver.Link;
 import twaver.Node;
 import twaver.TWaverConst;
 import twaver.network.TNetwork;
@@ -10,15 +11,14 @@ import twaver.network.ui.EditableBorderUI;
 import twaver.network.ui.NodeUI;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 
 /**
- * Created by Administrator on 2017-02-17.
+ * Created by user on 2017/4/2.
  */
-public class VariableFieldUI extends NodeUI {
-    private VariableField variableField = null;
+public class MainUserUI extends NodeUI {
+    private MainUser mainUser = null;
     protected BorderUI editableBorder = null;
-    public VariableFieldUI(TNetwork network, Node element) {
+    public MainUserUI(TNetwork network, Node element) {
         super(network, element);
     }
     public BorderUI getBorder() {
@@ -39,23 +39,27 @@ public class VariableFieldUI extends NodeUI {
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);
-        variableField = (VariableField) this.getElement();
+        mainUser = (MainUser) this.getElement();
+
 
         //get position
-        final Point location = variableField.getLocation();
-        final Dimension size = variableField.getBounds().getSize();
-        boolean isRotate = variableField.isRotate();
+        final Point location = mainUser.getLocation();
+        final Dimension size = mainUser.getBounds().getSize();
         int x = location.x;
         int y = location.y;
         int width = size.width;
         int height = size.height;
+        if(mainUser.getToLinks()!=null) {
+            if (((Link) mainUser.getToLinks().get(0)).getFrom().getLocation().getY() < y)
+                mainUser.setToPoint(x + width / 2, y);
+            else
+                mainUser.setToPoint(x + width / 2, y + height);
+        }
 
-        Font ValueFont = new Font("黑体", 12, height / 2);
+        Font ValueFont = new Font("黑体", Font.BOLD, 20);
 
         g.setColor(Color.white);
         g.setFont(ValueFont);
-        g.drawString("变电站", x - width / 8, y + height / 2);
-
-
+        g.drawString("用电用户", x, y + height / 2);
     }
 }

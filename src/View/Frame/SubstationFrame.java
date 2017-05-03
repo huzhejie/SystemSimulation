@@ -165,6 +165,7 @@ public class SubstationFrame extends JFrame{
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"变电所资料修改成功!");
+                SubstationFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

@@ -298,6 +298,13 @@ public class MenuBar extends JMenuBar {
                 }
             }
         });
+        //全选操作
+        item9.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                network.getDataBox().selectAll();
+            }
+        });
         //设置背景色
         item10.addActionListener(new ActionListener() {
             @Override

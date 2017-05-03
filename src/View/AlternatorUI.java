@@ -1,6 +1,7 @@
 package View;
 
 import Control.Alternator;
+import Utils.Graphics2Dextend;
 import twaver.Node;
 import twaver.TWaverConst;
 import twaver.network.TNetwork;
@@ -10,7 +11,6 @@ import twaver.network.ui.EditableBorderUI;
 import twaver.network.ui.NodeUI;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 
 /**
  * Created by Administrator on 2017-02-17.
@@ -36,13 +36,7 @@ public class AlternatorUI extends NodeUI {
             return this.defaultBorder;
         }
     }
-    public void performAction(int gesture, MouseEvent e){
-        if(gesture== TWaverConst.MOUSE_RIGHT_CLICKED){
-            if(alternator !=null){
-                alternator.setRotate(!alternator.isRotate());
-            }
-        }
-    }
+
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);
@@ -57,7 +51,7 @@ public class AlternatorUI extends NodeUI {
         int width = size.width;
         int height = size.height;
 
-        alternator.getRenderColor();
+        g.setColor(alternator.getRenderColor());
         //设置背景色
         if(!isRotate){
             alternator.setFromPoint(0,-height/2);

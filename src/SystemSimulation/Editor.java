@@ -43,24 +43,12 @@ public class Editor {
 //                System.out.println(network.getDataBox().getLastSelectedElement().getID());
                 if(e.getButton()==MouseEvent.BUTTON1){
 //                    System.out.println(temp);
-                    switch(temp){
-                        case "":
-                            break;
-                        default:
-                            element = componentBox.getElementByName(temp).copy();
-                            int id;
-//                            if(element instanceof Trunk) {
-//                                ((ArrayList<Element>)network.getClientProperty("rootList")).add(element);
-//                            }
-//                            else if(element instanceof DistributionStation){
-//                                ((ArrayList<Element>)network.getClientProperty("rootList")).add(element);
-//                            }
-                            if(element!=null&&!indexSet.getSet().equals(element.getName())) {
-                                double zoom = network.getZoomer().getZoom();
-                                element.setLocation(e.getX()/zoom,e.getY()/zoom);
-                                box.addElement(element);
-                                temp = "";
-                            }
+                    if(!temp.equals("")){
+                        element = componentBox.getElementByName(temp).copy();
+                        int id;
+                        if(element!=null&&!indexSet.getSet().equals(element.getName())) {
+                            double zoom = network.getZoomer().getZoom();
+                            element.setLocation(e.getX()/zoom,e.getY()/zoom);
                             Class clazz = null;
                             switch (element.getName()){
                                 case "母线":
@@ -144,18 +132,16 @@ public class Editor {
                                 case "配电隔离开关":
                                     clazz = IsolationOfPowerDis.class;
                                     break;
-                                case "电容器":
-                                    clazz = CapacitorA.class;
-                                    break;
                             }
-                            if(network.getDataBox().getElementsByType(clazz)==null)
+                            if(network.getDataBox().getElementsByType(clazz).size()==0)
                                 id = 1;
                             else
-                                id = network.getDataBox().getElementsByType(clazz).size();
+                                id = network.getDataBox().getElementsByType(clazz).size()+1;
                             element.setName(element.getName()+id);
                             element.putClientProperty("numberID",id);
-//                            System.out.println(element.getID());
-                            break;
+                            box.addElement(element);
+                            temp = "";
+                        }
                     }
                 }
             }

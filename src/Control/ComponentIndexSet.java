@@ -11,7 +11,7 @@ public class ComponentIndexSet {
     public ComponentIndexSet(){
         //添加元件目录
         set.add("开关类");
-        set.add("卷变类");
+//        set.add("卷变类");
         set.add("断路器类");
         set.add("PT类");
         set.add("站用变类");

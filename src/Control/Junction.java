@@ -12,7 +12,6 @@ import java.util.List;
  * Created by Administrator on 2017-02-17.
  */
 public class Junction extends ResizableNode {
-    private boolean isRotate = false;
     private Point fromPoint = new Point(0,0);
     private Point toPoint = new Point(0,0);
     public Junction() {
@@ -26,16 +25,6 @@ public class Junction extends ResizableNode {
         this.putBorderInsets(12);
         this.putBorderStroke(TWaverConst.STROKE_SQUARE_THINNEST);
         this.setSize(30,30);
-    }
-    public boolean isRotate(){
-        return isRotate;
-    }
-    public void setRotate(boolean isRotate){
-        if(this.isRotate!=isRotate){
-            boolean oldValue = this.isRotate;
-            this.isRotate = isRotate;
-            this.firePropertyChange("isRotate",oldValue,this.isRotate);
-        }
     }
     public String getUIClassID() {
         return JunctionUI.class.getName();

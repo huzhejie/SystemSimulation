@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -227,6 +229,39 @@ public class FeederFrame extends JFrame {
         aa.setEditable(false);
         bb.setEditable(false);
 
+        dd.addItem("10kv");
+        dd.addItem("35kv");
+        dd.addItem("110kv");
+        dd.addItem("220kv");
+        dd.addItem("500kv");
+        dd.setSelectedItem("10kv");
+
+        ee.setText("1.0");
+        gg.setText("1.0");
+
+        ee.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                int keyChar = e.getKeyChar();
+                if((keyChar>=KeyEvent.VK_0&&keyChar<=KeyEvent.VK_9)||keyChar==KeyEvent.VK_DECIMAL){
+
+                }
+                else
+                    e.consume();
+            }
+        });
+        gg.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                int keyChar = e.getKeyChar();
+                if((keyChar>=KeyEvent.VK_0&&keyChar<=KeyEvent.VK_9)||keyChar==KeyEvent.VK_DECIMAL){
+
+                }
+                else
+                    e.consume();
+            }
+        });
+
         /**
          * 载入数据
          */
@@ -235,11 +270,16 @@ public class FeederFrame extends JFrame {
         vertify.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //更新开关电压等级数据
-                element.putClientProperty("rootVoltage",ff.getSelectedItem());
+                //更新电压等级数据
+                element.putClientProperty("rootVoltage",dd.getSelectedItem());
+                //更新控制电流大小
+                element.putClientProperty("current",ee.getText().trim());
+                //更新馈线长度
+                element.putClientProperty("length",gg.getText().trim());
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"馈线资料修改成功!");
+                FeederFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

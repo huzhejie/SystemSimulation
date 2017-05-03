@@ -2,6 +2,7 @@ package View;
 
 
 import Control.Fuses;
+import Utils.Graphics2Dextend;
 import twaver.Node;
 import twaver.TWaverConst;
 import twaver.network.TNetwork;
@@ -11,7 +12,6 @@ import twaver.network.ui.EditableBorderUI;
 import twaver.network.ui.NodeUI;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 
 /**
  * Created by Administrator on 2017-03-02.
@@ -37,13 +37,7 @@ public class FusesUI  extends NodeUI {
             return this.defaultBorder;
         }
     }
-    public void performAction(int gesture, MouseEvent e){
-        if(gesture== TWaverConst.MOUSE_RIGHT_CLICKED){
-            if(fuses !=null){
-                fuses.setRotate(!fuses.isRotate());
-            }
-        }
-    }
+
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);

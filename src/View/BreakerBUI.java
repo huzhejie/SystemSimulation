@@ -36,13 +36,7 @@ public class BreakerBUI extends NodeUI {
             return this.defaultBorder;
         }
     }
-    public void performAction(int gesture, MouseEvent e){
-        if(gesture==TWaverConst.MOUSE_RIGHT_CLICKED){
-            if(breakerB !=null){
-                breakerB.setRotate(!breakerB.isRotate());
-            }
-        }
-    }
+
     public void paintBody(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setStroke(TWaverConst.DOUBLE_WIDTH_STROKE);

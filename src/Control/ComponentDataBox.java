@@ -27,17 +27,17 @@ public class ComponentDataBox extends TDataBox{
         Node node2 = new Node();
         node2.setIcon(null);
         node2.setImage(null);
-        node2.setName("卷变类");
+        node2.setName("变压器类");
 
-        Node node3 = new Node();
-        node3.setIcon(null);
-        node3.setImage(null);
-        node3.setName("PT类");
+//        Node node3 = new Node();
+//        node3.setIcon(null);
+//        node3.setImage(null);
+//        node3.setName("PT类");
 
-        Node node4 = new Node();
-        node4.setIcon(null);
-        node4.setImage(null);
-        node4.setName("变压器类");
+//        Node node4 = new Node();
+//        node4.setIcon(null);
+//        node4.setImage(null);
+//        node4.setName("变压器类");
 
         Node node5 = new Node();
         node5.setIcon(null);
@@ -93,7 +93,7 @@ public class ComponentDataBox extends TDataBox{
         VariableField switch_8 = new VariableField();
         switch_8.setName("变电站");
         switch_8.setIcon(ComponentDataBox.class.getResource("resource/VariableField.png").toString());
-        switch_8.setParent(node4);
+        switch_8.setParent(node6);
 
         Fuse switch_9 = new Fuse();
         switch_9.setName("保险丝");
@@ -130,26 +130,26 @@ public class ComponentDataBox extends TDataBox{
         switch_15.setIcon(ComponentDataBox.class.getResource("resource/LightningArresterA.png").toString());
         switch_15.setParent(node5);
 
-        PT switch_16=new  PT();
-        switch_16.setName("PTB");
-        switch_16.setIcon(ComponentDataBox.class.getResource("resource/PT.png").toString());
-        switch_16.setParent(node3);
-
-
-        PTA switch_17=new  PTA();
-        switch_17.setName("PTA");
-        switch_17.setIcon(ComponentDataBox.class.getResource("resource/PTA.png").toString());
-        switch_17.setParent(node3);
+//        PT switch_16=new  PT();
+//        switch_16.setName("PTB");
+//        switch_16.setIcon(ComponentDataBox.class.getResource("resource/PT.png").toString());
+//        switch_16.setParent(node3);
+//
+//
+//        PTA switch_17=new  PTA();
+//        switch_17.setName("PTA");
+//        switch_17.setIcon(ComponentDataBox.class.getResource("resource/PTA.png").toString());
+//        switch_17.setParent(node3);
 
         StandChange switch_18 =new StandChange();
         switch_18.setName("站用变B");
         switch_18.setIcon(ComponentDataBox.class.getResource("resource/StandChange.png").toString());
-        switch_18.setParent(node4);
+        switch_18.setParent(node2);
 
         StandChangeA switch_19 =new StandChangeA();
         switch_19.setName("站用变A");
         switch_19.setIcon(ComponentDataBox.class.getResource("resource/PTA.png").toString());
-        switch_19.setParent(node4);
+        switch_19.setParent(node2);
 
         DistributionStation  switch_20 =new DistributionStation();
         switch_20.setName("配电站");
@@ -159,7 +159,7 @@ public class ComponentDataBox extends TDataBox{
         BoxChange switch_21 =new BoxChange();
         switch_21.setName("箱变");
         switch_21.setIcon(ComponentDataBox.class.getResource("resource/BoxChange.png").toString());
-        switch_21.setParent(node4);
+        switch_21.setParent(node6);
 
         Fuses  switch_22 =new Fuses();
         switch_22.setName("熔断器");
@@ -195,12 +195,17 @@ public class ComponentDataBox extends TDataBox{
         switch_27.setIcon(ComponentDataBox.class.getResource("resource/Trunk.png").toString());
         switch_27.setParent(node6);
 
+        MainUser switch_28 = new MainUser();
+        switch_28.setName("用电用户");
+        switch_28.setIcon(ComponentDataBox.class.getResource("resource/MainUser.png").toString());
+        switch_28.setParent(node7);
+
 
         this.addElement(node);
         this.addElement(node1);
         this.addElement(node2);
-        this.addElement(node3);
-        this.addElement(node4);
+//        this.addElement(node3);
+//        this.addElement(node4);
         this.addElement(node5);
         this.addElement(node6);
         this.addElement(node7);
@@ -219,8 +224,8 @@ public class ComponentDataBox extends TDataBox{
         this.addElement(switch_13);
         this.addElement(switch_14);
         this.addElement(switch_15);
-        this.addElement(switch_16);
-        this.addElement(switch_17);
+//        this.addElement(switch_16);
+//        this.addElement(switch_17);
         this.addElement(switch_18);
         this.addElement(switch_19);
         this.addElement(switch_20);
@@ -231,7 +236,7 @@ public class ComponentDataBox extends TDataBox{
         this.addElement(switch_25);
         this.addElement(switch_26);
         this.addElement(switch_27);
-//        this.addElement(switch_28);
+        this.addElement(switch_28);
 
 
 

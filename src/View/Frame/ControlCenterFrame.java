@@ -180,6 +180,14 @@ public class ControlCenterFrame extends JFrame {
         g1.gridwidth = 2;
         mainPanel.add(jj,g1);
 
+        aa.setText(element.getName());
+        aa.setEditable(false);
+        bb.setEditable(false);
+        if(element.getClientProperty("numberID")!=null)
+            bb.setText(element.getClientProperty("numberID").toString());
+        else
+            bb.setText("");
+
         ee.addItem("武昌区");
         ee.addItem("洪山区");
         ee.addItem("蔡甸区");
@@ -241,6 +249,7 @@ public class ControlCenterFrame extends JFrame {
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"配变资料修改成功!");
+                ControlCenterFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {
@@ -298,7 +307,7 @@ public class ControlCenterFrame extends JFrame {
                 Statement stmt = connection.createStatement();
                 String query = "INSERT INTO mainuser(MatchID,PrimitiveName,Description,MatchType,BelongArea,VoltageLevel,MPSupply,installStation,ContainerKVA,MatchNum,UserName,UserTeleNo)"+
                         "VALUES ('"+element.getClientProperty("ID").toString()+"','"+aa.getText().trim()+"','"+cc.getText().trim()+"','"+dd.getSelectedItem().toString()+"','"+ee.getSelectedItem().toString()+"','"+
-                        ff.getSelectedItem().toString()+"','"+gg.getSelectedItem().toString()+"','"+hh.getSelectedItem().toString()+"',"+Integer.parseInt(ii.getText().trim())+","+Integer.parseInt(jj.getSelectedItem().toString())+",'"+kk.getText()+"','"+ll.getText()+"')";
+                        ff.getSelectedItem().toString()+"','"+gg.getSelectedItem().toString()+"','"+hh.getSelectedItem().toString()+"',"+Double.parseDouble(ii.getText().trim())+","+Integer.parseInt(jj.getSelectedItem().toString())+",'"+kk.getText()+"','"+ll.getText()+"')";
                 stmt.execute(query);
                 stmt.close();
             }catch (Exception e){
@@ -309,7 +318,7 @@ public class ControlCenterFrame extends JFrame {
             try{
                 Statement stmt = connection.createStatement();
                 String query = "UPDATE mainuser SET PrimitiveName='"+element.getName().trim()+"',Description='"+cc.getText().trim()+"',MatchType='"+dd.getSelectedItem().toString()+"',BelongArea='"+ee.getSelectedItem().toString()+"',VoltageLevel='"+
-                        ff.getSelectedItem().toString()+"',MPSupply='"+gg.getSelectedItem().toString()+"',installStation='"+hh.getSelectedItem().toString()+"',ContainerKVA="+Integer.parseInt(ii.getText().trim())+",MatchNum="+Integer.parseInt(jj.getSelectedItem().toString())+
+                        ff.getSelectedItem().toString()+"',MPSupply='"+gg.getSelectedItem().toString()+"',installStation='"+hh.getSelectedItem().toString()+"',ContainerKVA="+Double.parseDouble(ii.getText().trim())+",MatchNum="+Integer.parseInt(jj.getSelectedItem().toString())+
                         ",UserName='"+kk.getText().trim()+"',UserTeleNo='"+ll.getText().trim()+"' WHERE MatchID='"+element.getClientProperty("ID")+"'";
                 stmt.execute(query);
                 stmt.close();

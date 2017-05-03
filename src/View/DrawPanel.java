@@ -35,10 +35,8 @@ public class DrawPanel extends TNetwork{
             "ZoomToRectangle",
             "$SEPARATOR",//分隔符
             "CreateLink",
-            "CreateOrthogonalLink",
-            "CreateFlexionLink",
             "CreateShapeLink",
-            "CreateText",
+            "$SEPARATOR",//分隔符
             "Undo",
             "Redo",
             "$SEPARATOR",
@@ -87,6 +85,12 @@ public class DrawPanel extends TNetwork{
         //设置工具栏
         this.setToolbar(NetworkToolBarFactory.getToolBar(ids, this));
         this.getToolbar().setMinimumSize(new Dimension(50,50));
+        //设置undo/redo的步数限制
+        this.getDataBox().getUndoRedoManager().setLimit(100);
+        //允许使用快捷键ctrl+y与ctrl+z
+        this.setEnableUndoRedoWithKeyboard(true);
+        //允许使用快捷键ctrl+a全选
+        this.setEnableSelectAllWithKeyboard(true);
         //设置Resizable Node可以直接改变大小
         this.setResizableFilter(new ResizableFilter() {
             @Override
@@ -118,7 +122,7 @@ public class DrawPanel extends TNetwork{
                         final JMenuItem attribute = new JMenuItem("图形属性");
                         final JMenuItem property = new JMenuItem("设备资料");
                         final JMenuItem rotate = new JMenuItem("旋转90°");
-                        JMenuItem paint = new JMenuItem("重新着色");
+                        final JMenuItem paint = new JMenuItem("重新着色");
                         final JMenuItem addPoint = new JMenuItem("增加节点");
                         final JMenuItem removePoint  = new JMenuItem("删除节点");
                         final JMenuItem open = new JMenuItem("断开开关");
@@ -231,8 +235,9 @@ public class DrawPanel extends TNetwork{
                                     });
                                 }
                             }
-                            //如果是卷变器
-                            else if(element instanceof DoubleRollChange){
+                            //如果是卷变器或者站用变
+                            else if(element instanceof RollChange){
+                                rotate.setVisible(true);
                                 property.setVisible(true);
                                 property.addActionListener(new ActionListener() {
                                     @Override
@@ -241,9 +246,18 @@ public class DrawPanel extends TNetwork{
                                         property.setVisible(false);
                                     }
                                 });
+                                rotate.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((RollChange) element).setRotate(!((RollChange) element).isRotate());
+                                        ((RollChange) element).setSize(element.getHeight(),element.getWidth());
+                                        rotate.setVisible(false);
+                                    }
+                                });
                             }
                             //如果是断路器
                             else if(element instanceof Breaker){
+                                rotate.setVisible(true);
                                 property.setVisible(true);
                                 property.addActionListener(new ActionListener() {
                                     @Override
@@ -254,6 +268,14 @@ public class DrawPanel extends TNetwork{
                                         frame.pack();
                                         frame.setVisible(true);
                                         property.setVisible(false);
+                                    }
+                                });
+                                rotate.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((Breaker) element).setRotate(!((Breaker) element).isRotate());
+                                        ((Breaker) element).setSize(element.getHeight(),element.getWidth());
+                                        rotate.setVisible(false);
                                     }
                                 });
                             }
@@ -297,8 +319,48 @@ public class DrawPanel extends TNetwork{
                                     });
                                 }
                             }
-                            //如果是重要用户，箱变，配电站
-                            else if(element instanceof BoxChange || element instanceof DistributionStation){
+                            //如果是箱变，配电站
+                            else if(element instanceof BoxChange){
+                                rotate.setVisible(true);
+                                property.setVisible(true);
+                                property.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        new ControlCenterFrame(element,connection);
+                                        property.setVisible(false);
+                                    }
+                                });
+                                rotate.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((BoxChange) element).setRotate(!((BoxChange) element).isRotate());
+                                        ((BoxChange) element).setSize(element.getHeight(),element.getWidth());
+                                        rotate.setVisible(false);
+                                    }
+                                });
+                            }
+                            //如果是变电站
+                            else if(element instanceof DistributionStation){
+                                rotate.setVisible(true);
+                                property.setVisible(true);
+                                property.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        new ControlCenterFrame(element,connection);
+                                        property.setVisible(false);
+                                    }
+                                });
+                                rotate.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((DistributionStation) element).setRotate(!((DistributionStation) element).isRotate());
+                                        ((DistributionStation) element).setSize(element.getHeight(),element.getWidth());
+                                        rotate.setVisible(false);
+                                    }
+                                });
+                            }
+                            //如果是用电用户
+                            else if(element instanceof MainUser){
                                 property.setVisible(true);
                                 property.addActionListener(new ActionListener() {
                                     @Override
@@ -310,12 +372,21 @@ public class DrawPanel extends TNetwork{
                             }
                             //如果是熔断器，跌落熔断器，保险丝
                             else if(element instanceof Fuse){
+                                rotate.setVisible(true);
                                 property.setVisible(true);
                                 property.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         new FuseFrame(element,connection);
                                         property.setVisible(false);
+                                    }
+                                });
+                                rotate.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        ((Fuse) element).setRotate(!((Fuse) element).isRotate());
+                                        ((Fuse) element).setSize(element.getHeight(),element.getWidth());
+                                        rotate.setVisible(false);
                                     }
                                 });
                             }
@@ -330,23 +401,9 @@ public class DrawPanel extends TNetwork{
                                     }
                                 });
                             }
-                            //如果是开闭所，环网柜，分支箱
-//                        else if(element instanceof kaibisuo){
-//                            property.setVisible(true);
-//                            property.addActionListener(new ActionListener() {
-//                                @Override
-//                                public void actionPerformed(ActionEvent e) {
-//                                    new SwitchStationFrame();
-//                                    property.setVisible(false);
-//                                }
-//                            });
-//                        }
-
-                            //如果是多节点连线的元件
-                            else if(element instanceof ShapeLink) {
-                                //如果是馈线
-                                if (((ShapeLink) element).getFrom() instanceof Trunk){
-                                    property.setVisible(true);
+                            //如果是馈线
+                            else if(element instanceof Link && !(element instanceof ShapeLink)){
+                                property.setVisible(true);
                                 property.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
@@ -355,6 +412,8 @@ public class DrawPanel extends TNetwork{
                                     }
                                 });
                             }
+                            //如果是多节点连线的元件
+                            else if(element instanceof ShapeLink) {
                                 addPoint.setVisible(true);
                                 removePoint.setVisible(true);
                                 addPoint.addActionListener(new ActionListener() {
@@ -381,12 +440,12 @@ public class DrawPanel extends TNetwork{
                 }
             });
             //双击元素标签可以重新编辑该标签
-//        this.setElementLabelEditableFilter(new EditableFilter() {
-//            @Override
-//            public boolean isEditable(Element element) {
-//                return true;
-//            }
-//        });
+        this.setElementLabelEditableFilter(new EditableFilter() {
+            @Override
+            public boolean isEditable(Element element) {
+                return true;
+            }
+        });
             //加快拖动速度
         this.setDraggingSpeed(DraggingSpeed.HIGH);
             //可以使用ctrl+c以及ctrl+v快捷键(不复制子节点)

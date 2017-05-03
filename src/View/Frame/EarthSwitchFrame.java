@@ -169,6 +169,7 @@ public class EarthSwitchFrame extends JFrame {
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"接地开关资料修改成功!");
+                EarthSwitchFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

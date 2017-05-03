@@ -159,6 +159,7 @@ public class SwitchFrame extends JFrame{
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"开关资料修改成功!");
+                SwitchFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

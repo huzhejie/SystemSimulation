@@ -181,6 +181,7 @@ public class FuseFrame extends JFrame {
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"熔断器资料修改成功!");
+                FuseFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

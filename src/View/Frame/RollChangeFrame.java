@@ -304,6 +304,7 @@ public class RollChangeFrame extends JFrame {
                 //插入或更新数据
                 writeData(element,connection);
                 JOptionPane.showMessageDialog(null,"卷变资料修改成功!");
+                RollChangeFrame.this.setVisible(false);
             }
         });
         cancel.addActionListener(new ActionListener() {

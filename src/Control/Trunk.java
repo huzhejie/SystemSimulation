@@ -20,11 +20,11 @@ public class Trunk extends ResizableNode {
         init();
     }
     public void init(){
-        this.putRenderColor(Color.WHITE);
+        this.putRenderColor(Color.RED);
         this.putBorderColor(Color.black);
         this.putBorderInsets(12);
         this.putBorderStroke(TWaverConst.STROKE_SQUARE_THINNEST);
-        this.setSize(10,50);
+        this.setSize(10,80);
     }
 
     public boolean isRotate() {

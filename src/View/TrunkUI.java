@@ -10,6 +10,7 @@ import twaver.network.ui.EditableBorderUI;
 import twaver.network.ui.NodeUI;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.*;
 
 /**
@@ -61,10 +62,16 @@ public class TrunkUI extends NodeUI {
         toPointList.clear();
 
         if(!isRotate){
-            g.drawLine(x+width/2,y,x+width/2,y+height);
+            Line2D line = new Line2D.Double(x+width/2,y,x+width/2,y+height);
+            BasicStroke bs = new BasicStroke(13,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL);
+            g.setStroke(bs);
+            g.draw(line);
         }
         else{
-            g.drawLine(x,y+height/2,x+width,y+height/2);
+            Line2D line = new Line2D.Double(x,y+height/2,x+width,y+height/2);
+            BasicStroke bs = new BasicStroke(13,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL);
+            g.setStroke(bs);
+            g.draw(line);
         }
         trunk.setToPointList(toPointList);
     }
