@@ -22,7 +22,7 @@ public class Topology {
     private ArrayList<Data> dataList = null;
     private Double distance = 0.00d;
     private Double power = 0.00d;
-    private static Element root = null;
+    private Element root = null;
     public Topology(DrawPanel network){
         this.network = network;
         network.putClientProperty("switchList",new ArrayList<Element>());

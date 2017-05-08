@@ -13,6 +13,7 @@ public class Data {
     public Double distance;
     public Double power;
     public Double reward = 0.0d;
+//    public int totalPower = 0;
     public Data(Double distance,Double power,Switch aSwitch,Element root,Element to){
         this.aSwitch = aSwitch;
         this.root =  root;

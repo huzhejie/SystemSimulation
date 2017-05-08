@@ -1,5 +1,6 @@
 package SystemSimulation;
 
+import Utils.CheckPrinciple;
 import Utils.Topology;
 import View.DrawPanel;
 import View.Frame.ExportImageFrame;
@@ -115,7 +116,7 @@ public class MenuBar extends JMenuBar {
         item15.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2,ActionEvent.CTRL_MASK));
         topologyMenu.add(item15);
         //图元入库
-        JMenuItem item16 = new JMenuItem("图元入库");
+        JMenuItem item16 = new JMenuItem("N-1安全检验");
         topologyMenu.add(item16);
         /**
          * 帮助菜单
@@ -335,6 +336,24 @@ public class MenuBar extends JMenuBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Topology(network);
+            }
+        });
+        //N-1安全检验
+        item16.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new CheckPrinciple(network);
+            }
+        });
+        //设备资料完整性检查
+        item15.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Element> list = (ArrayList<Element>)network.getDataBox().getAllElements();
+                for(Element element:list){
+                    if(element.getClientProperty("rootVoltage")==null)
+                        JOptionPane.showMessageDialog(null,"图元 "+element.getName()+" 的资料还未补充完成");
+                }
             }
         });
 
